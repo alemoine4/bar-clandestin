@@ -489,7 +489,7 @@ const SearchInput = ({ value, onChange, onClear, label = "Rechercher une bouteil
         placeholder="Rechercher une bouteille..."
         value={value}
         onChange={onChange}
-        className={`bg-stone-900/80 border border-stone-600 text-amber-50 py-2.5 pl-10 pr-12 rounded text-sm focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/40 transition-all placeholder:text-stone-300 font-serif ${fullWidth ? 'w-full' : 'w-full sm:w-64'}`}
+        className={`bg-stone-900/80 border border-stone-600 text-amber-50 min-h-[48px] py-3 pl-10 pr-12 rounded text-sm focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/40 transition-all placeholder:text-stone-300 font-serif ${fullWidth ? 'w-full' : 'w-full sm:w-64'}`}
       />
       <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-amber-500 transition-colors" aria-hidden="true" />
       {value && (
@@ -750,6 +750,28 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     return () => clearTimeout(timeout);
   }, [step]);
 
+  // Piège de focus + Échap : le kiosque est un vrai modal, on ne doit pas pouvoir
+  // tabuler vers l'app barman derrière (celle-ci est aussi passée en `inert`).
+  const handleKeyDown = useCallback((event) => {
+    if (event.key === 'Escape') {
+      event.stopPropagation();
+      onExit();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    const focusable = getFocusableElements(screenRef.current);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }, [onExit]);
+
   const currentGuest = useMemo(() => {
     const norm = normalizeText(guestName.trim());
     return norm ? guests.find(g => normalizeText(g.name) === norm) : null;
@@ -826,7 +848,11 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   return (
     <div
       ref={screenRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Le Bar Clandestin — choix des invités"
       tabIndex={-1}
+      onKeyDown={handleKeyDown}
       className="fixed inset-0 z-50 bg-[var(--whisky-bg)] overflow-auto custom-scrollbar focus-visible:outline-none"
     >
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50vw] h-[45vh] bg-amber-600/5 blur-[80px] rounded-full pointer-events-none" aria-hidden="true" />
@@ -915,7 +941,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 {currentChoiceName ? (
                   <p className="text-amber-300/90 text-sm font-serif italic">Ton choix actuel : {currentChoiceName} — tape une carte pour en changer.</p>
                 ) : (
-                  <p className="text-stone-300 text-sm uppercase tracking-[0.2em]">Choisis ta bouteille</p>
+                  <p className="text-stone-300 text-sm uppercase tracking-[0.2em]">Choisis une ou plusieurs envies, ou pioche direct une bouteille</p>
                 )}
               </div>
 
@@ -951,12 +977,27 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                     </div>
                   );
                 };
+                const hasFilters = selectedTags.length > 0;
                 return (
                   <div className="mb-6 max-w-3xl mx-auto space-y-5">
                     <div className="flex justify-center">
-                      <button type="button" aria-pressed={selectedTags.length === 0} onClick={() => setSelectedTags([])} className={chipBase(selectedTags.length === 0, 'w-40')}>
-                        <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Tout
-                      </button>
+                      {hasFilters ? (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTags([])}
+                          aria-label="Effacer les envies sélectionnées"
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[52px] rounded-full text-sm font-bold border border-amber-600 text-amber-300 hover:bg-amber-950/40 transition-colors"
+                        >
+                          <X size={16} strokeWidth={2} aria-hidden="true" /> Effacer les envies ({selectedTags.length})
+                        </button>
+                      ) : (
+                        <span
+                          role="status"
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[52px] rounded-full text-sm font-bold border border-amber-500 bg-amber-500 text-black"
+                        >
+                          <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Toutes les bouteilles
+                        </span>
+                      )}
                     </div>
                     {renderGroup('Ambiance', kioskFilterGroups.moods, 'mood')}
                     {renderGroup('Arôme', kioskFilterGroups.profiles, 'profile')}
@@ -1956,7 +1997,7 @@ export default function WhiskyBarApp() {
         />
       </Modal>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-16">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-16" inert={(barMode || !!servingWhisky) || undefined}>
         {/* Header */}
         <header className="flex flex-col items-center mb-16 text-center">
           <div className="mb-8" aria-hidden="true">
