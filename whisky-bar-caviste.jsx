@@ -471,20 +471,20 @@ const ColorBadge = ({ color }) => (
   </div>
 );
 
-const SearchInput = ({ value, onChange, onClear, label = "Rechercher une bouteille" }) => {
+const SearchInput = ({ value, onChange, onClear, label = "Rechercher une bouteille", fullWidth = false }) => {
   const inputRef = useRef(null);
   const inputId = useId();
   return (
-    <div className="relative group w-full sm:w-auto">
+    <div className={`relative group ${fullWidth ? 'w-full' : 'w-full sm:w-auto'}`}>
       <label htmlFor={inputId} className="sr-only">{label}</label>
-      <input 
+      <input
         id={inputId}
         ref={inputRef}
-        type="text" 
-        placeholder="Rechercher une bouteille..." 
+        type="text"
+        placeholder="Rechercher une bouteille..."
         value={value}
         onChange={onChange}
-        className="bg-stone-900/80 border border-stone-600 text-amber-50 py-2.5 pl-10 pr-12 rounded text-sm focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/40 w-full sm:w-64 transition-all placeholder:text-stone-300 font-serif"
+        className={`bg-stone-900/80 border border-stone-600 text-amber-50 py-2.5 pl-10 pr-12 rounded text-sm focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/40 transition-all placeholder:text-stone-300 font-serif ${fullWidth ? 'w-full' : 'w-full sm:w-64'}`}
       />
       <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-300 group-focus-within:text-amber-500 transition-colors" aria-hidden="true" />
       {value && (
@@ -849,6 +849,16 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
 
           {step === 'choose' && (
             <div className="animate-fadeIn text-left">
+              <div className="flex justify-center mb-8">
+                <button
+                  type="button"
+                  onClick={resetToName}
+                  className="inline-flex items-center gap-2 px-6 py-3 min-h-[48px] border border-stone-600 rounded-full text-stone-200 hover:text-amber-300 hover:border-amber-500 text-xs font-bold uppercase tracking-widest transition-colors"
+                >
+                  <ArrowLeft size={16} aria-hidden="true" /> Changer de prénom
+                </button>
+              </div>
+
               <div className="text-center mb-8">
                 <h1 className="text-3xl md:text-4xl font-thin text-[var(--whisky-cream)] font-serif mb-2">
                   Pour <span className="text-[var(--whisky-gold)]">{guestName.trim()}</span>
@@ -884,17 +894,20 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 </div>
               )}
 
-              <div className="text-center mb-8">
+              <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 mb-8 max-w-2xl mx-auto">
+                <div className="w-full sm:flex-1">
+                  <SearchInput value={search} onChange={e => setSearch(e.target.value)} onClear={() => setSearch('')} label="Rechercher un whisky" fullWidth />
+                </div>
                 <button
                   type="button"
                   onClick={handleSurprise}
-                  className="inline-flex items-center gap-3 px-8 py-4 min-h-[52px] border border-amber-400 text-amber-200 hover:text-black hover:bg-amber-500 rounded-full uppercase text-sm font-bold tracking-widest transition-colors"
+                  className="w-full sm:w-auto shrink-0 inline-flex items-center justify-center gap-3 px-8 py-3 min-h-[48px] border border-amber-400 text-amber-200 hover:text-black hover:bg-amber-500 rounded-full uppercase text-sm font-bold tracking-widest transition-colors"
                 >
                   <Sparkles size={18} aria-hidden="true" /> Surprends-moi
                 </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6" role="list">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
                 {filteredWhiskies.map(w => {
                   const isCurrent = currentGuest?.whiskyId === w.id;
                   const chips = (w.profile || []).slice(0, 3)
@@ -938,16 +951,6 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 {filteredWhiskies.length === 0 && (
                   <p className="col-span-full text-center text-stone-300 font-serif italic py-10">Aucune bouteille ne correspond.</p>
                 )}
-              </div>
-
-              <div className="max-w-md mx-auto mb-8">
-                <SearchInput value={search} onChange={e => setSearch(e.target.value)} onClear={() => setSearch('')} label="Rechercher un whisky" />
-              </div>
-
-              <div className="text-center">
-                <button type="button" onClick={resetToName} className="text-stone-300 hover:text-amber-300 text-xs uppercase tracking-widest min-h-[44px] px-4 transition-colors">
-                  <ArrowLeft size={12} className="inline mr-2" aria-hidden="true" />Changer de prénom
-                </button>
               </div>
             </div>
           )}
@@ -1821,20 +1824,6 @@ export default function WhiskyBarApp() {
   const hasSelection = selectedProfiles.length > 0 || selectedMoods.length > 0 || showRandom;
   const matchCount = recommendedWhiskies.length;
 
-  if (barMode) {
-    return (
-      <GuestKiosk
-        whiskies={ownedWhiskies}
-        guests={partyGuests}
-        onChoose={upsertGuest}
-        onExit={() => setBarMode(false)}
-      />
-    );
-  }
-
-  if (servingWhisky) {
-    return <ServingScreen whisky={servingWhisky} onClose={() => setServingWhisky(null)} />;
-  }
 
   return (
     <div className="min-h-screen text-[var(--whisky-body)] font-sans selection:bg-amber-900/50 selection:text-white">
@@ -1846,6 +1835,17 @@ export default function WhiskyBarApp() {
       <div className="fixed bottom-0 right-0 w-[320px] h-[320px] bg-blue-900/5 blur-[70px] rounded-full pointer-events-none z-0" aria-hidden="true" />
 
       <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+      {/* Modes plein écran rendus en overlay pour conserver le <style> global (variables CSS, fond) */}
+      {barMode && (
+        <GuestKiosk
+          whiskies={ownedWhiskies}
+          guests={partyGuests}
+          onChoose={upsertGuest}
+          onExit={() => setBarMode(false)}
+        />
+      )}
+      {servingWhisky && <ServingScreen whisky={servingWhisky} onClose={() => setServingWhisky(null)} />}
       
       <Modal
         isOpen={showAddModal || !!editingWhisky}
@@ -1989,14 +1989,14 @@ export default function WhiskyBarApp() {
                       </div>
 
                       {/* Secondary Profiles */}
-                      <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto lg:grid lg:grid-cols-5 lg:gap-4 lg:max-w-4xl">
+                      <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto md:grid md:grid-cols-5 md:gap-4 md:max-w-3xl lg:max-w-4xl">
                         {TASTE_PROFILES.filter(p => !['tourbé', 'fumé'].includes(p.id)).map(profile => (
                           <button
                             type="button"
                             key={profile.id}
                             aria-pressed={selectedProfiles.includes(profile.id)}
                             onClick={() => toggleProfile(profile.id)}
-                            className={`px-4 py-2.5 min-h-[44px] lg:min-h-[52px] rounded-full text-[10px] lg:text-xs uppercase tracking-wider font-bold border transition-all duration-300 ${
+                            className={`px-4 py-2.5 min-h-[44px] md:min-h-[52px] rounded-full text-[10px] md:text-xs uppercase tracking-wider font-bold border transition-all duration-300 ${
                               selectedProfiles.includes(profile.id)
                                 ? 'bg-amber-900/30 border-amber-600 text-amber-300'
                                 : 'bg-stone-900/40 border-stone-600 text-stone-200 hover:border-amber-600/60 hover:text-stone-50'
