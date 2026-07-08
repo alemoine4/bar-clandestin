@@ -5,7 +5,7 @@ import {
   Share2, Trash2, Heart, Download, Upload, Plus, GlassWater, Sparkles, Pencil,
   ShoppingCart, Minus, Copy, PackageCheck, Martini,
   Moon, Armchair, Zap, Cake, Compass, Users, Beef, Mountain,
-  Candy, Apple, IceCream, TreePine, Hexagon, Waves, Flower2, Cookie
+  Candy, Apple, IceCream, TreePine, Hexagon, Waves, Flower2, Cookie, Settings2
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -521,7 +521,7 @@ const FilterButton = React.memo(({ active, onClick, Icon, label, className = '' 
         aria-hidden="true"
       />
     )}
-    <span className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${active ? 'text-amber-300 font-bold' : 'text-stone-200 group-hover:text-white'}`}>
+    <span className={`text-[11px] uppercase tracking-[0.2em] font-medium transition-colors ${active ? 'text-amber-300 font-bold' : 'text-stone-200 group-hover:text-white'}`}>
       {label}
     </span>
     {active && <div className="absolute inset-0 border border-amber-500/20 rounded-sm pointer-events-none" aria-hidden="true" />}
@@ -859,7 +859,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
 
               {guests.length > 0 && (
                 <div className="max-w-lg mx-auto">
-                  <p className="text-stone-300 text-[10px] uppercase tracking-[0.25em] font-bold mb-4">Déjà passés au bar</p>
+                  <p className="text-stone-300 text-[11px] uppercase tracking-[0.25em] font-bold mb-4">Déjà passés au bar</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {guests.map(g => {
                       const choiceName = whiskies.find(w => w.id === g.whiskyId)?.name;
@@ -916,7 +916,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                   }
                   return (
                     <div>
-                      <p className="text-stone-300 text-[10px] uppercase tracking-[0.25em] font-bold mb-3">{label}</p>
+                      <p className="text-stone-300 text-[11px] uppercase tracking-[0.25em] font-bold mb-3">{label}</p>
                       <div className="flex flex-wrap justify-center gap-2">
                         {shown.map(f => {
                           const isActive = filter?.type === type && filter?.id === f.id;
@@ -1102,7 +1102,7 @@ const AddWhiskyForm = ({ onAdd, onCancel, initialWhisky = null }) => {
 
   const inputClass = "w-full px-4 py-3 bg-stone-900/80 border border-stone-600 text-amber-50 focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/35 rounded transition-colors placeholder:text-stone-300 font-serif";
   const labelClass = "block text-amber-400 text-xs uppercase tracking-widest mb-2 font-bold";
-  const chipClass = (active) => `px-4 py-2 min-h-[44px] rounded-full text-[10px] uppercase tracking-wider font-bold border transition-all duration-300 inline-flex items-center gap-1.5 ${
+  const chipClass = (active) => `px-4 py-2 min-h-[44px] rounded-full text-[11px] uppercase tracking-wider font-bold border transition-all duration-300 inline-flex items-center gap-1.5 ${
     active
       ? 'bg-amber-900/30 border-amber-600 text-amber-300'
       : 'bg-transparent border-stone-600 text-stone-300 hover:border-stone-500 hover:text-stone-100'
@@ -2071,7 +2071,7 @@ export default function WhiskyBarApp() {
                             key={profile.id}
                             aria-pressed={selectedProfiles.includes(profile.id)}
                             onClick={() => toggleProfile(profile.id)}
-                            className={`px-4 py-2.5 min-h-[44px] md:min-h-[52px] rounded-full text-[10px] md:text-xs uppercase tracking-wider font-bold border transition-all duration-300 inline-flex items-center justify-center gap-2 ${
+                            className={`px-4 py-2.5 min-h-[44px] md:min-h-[52px] rounded-full text-[11px] md:text-xs uppercase tracking-wider font-bold border transition-all duration-300 inline-flex items-center justify-center gap-2 ${
                               selectedProfiles.includes(profile.id)
                                 ? 'bg-amber-900/30 border-amber-600 text-amber-300'
                                 : 'bg-stone-900/40 border-stone-600 text-stone-200 hover:border-amber-600/60 hover:text-stone-50'
@@ -2168,21 +2168,16 @@ export default function WhiskyBarApp() {
                           </div>
                         </div>
                       ) : (
-                        <div className="text-center py-12 flex flex-col items-center gap-8">
-                          <p className="text-stone-300 text-xs uppercase tracking-[0.2em]">En manque d'inspiration ?</p>
-                          <div className="flex flex-col sm:flex-row gap-6">
-                            <button type="button" onClick={handleSurpriseMe} className="group relative px-8 py-4 min-h-[48px] bg-stone-900 border border-stone-600 hover:border-amber-700 rounded overflow-hidden transition-all">
-                              <div className="absolute inset-0 bg-amber-900/10 group-hover:bg-amber-900/20 transition-colors" aria-hidden="true"></div>
-                              <span className="relative z-10 flex items-center gap-3 text-stone-300 group-hover:text-amber-300 text-xs font-bold uppercase tracking-widest transition-colors">
-                                <RefreshCw size={16} className="group-hover:rotate-180 transition-transform duration-500" aria-hidden="true" /> 
-                                Surprenez-moi
-                              </span>
+                        <div className="text-center py-12 flex flex-col items-center gap-6">
+                          <p className="text-stone-200 text-sm uppercase tracking-[0.2em]">En manque d'inspiration ?</p>
+                          <div className="flex flex-col items-center gap-4">
+                            <button type="button" onClick={handleSurpriseMe} className="group relative flex items-center gap-3 px-12 py-5 min-h-[56px] bg-amber-500 hover:bg-amber-400 text-black rounded-lg font-bold uppercase text-sm tracking-widest shadow-[0_10px_30px_-8px_rgba(245,158,11,0.5)] transition-colors">
+                              <RefreshCw size={20} className="group-hover:rotate-180 transition-transform duration-500" aria-hidden="true" />
+                              Surprenez-moi
                             </button>
-                            <button type="button" onClick={handleBrowseMode} className="group px-8 py-4 min-h-[48px] border border-stone-600 hover:bg-stone-900 rounded transition-all">
-                              <span className="flex items-center gap-3 text-stone-300 group-hover:text-stone-100 text-xs font-bold uppercase tracking-widest">
-                                <List size={16} aria-hidden="true" /> 
-                                Carte complète
-                              </span>
+                            <button type="button" onClick={handleBrowseMode} className="group flex items-center gap-2 px-6 py-3 min-h-[44px] text-stone-300 hover:text-amber-300 rounded transition-colors">
+                              <List size={16} aria-hidden="true" />
+                              <span className="text-xs font-bold uppercase tracking-widest border-b border-transparent group-hover:border-amber-400/60">ou voir la carte complète</span>
                             </button>
                           </div>
                         </div>
@@ -2199,19 +2194,25 @@ export default function WhiskyBarApp() {
               {/* Toolbar */}
               <div className="bg-stone-900/90 p-6 rounded-lg border border-stone-600 sticky top-4 z-30 shadow-2xl">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                  <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0">
-                    <button type="button" onClick={handleResetAllStock} className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-[10px] uppercase font-bold tracking-wider text-red-300 hover:text-red-200 bg-red-950/30 hover:bg-red-950/50 rounded border border-red-800/40 transition-all whitespace-nowrap">
-                      <Trash2 size={12} aria-hidden="true" /> Reset
-                    </button>
-                    <div className="h-4 w-px bg-stone-700 mx-2" aria-hidden="true"></div>
-                    <button type="button" onClick={handleExportData} className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-[10px] uppercase font-bold tracking-wider text-stone-300 hover:text-amber-300 hover:bg-stone-800 rounded transition-all whitespace-nowrap">
-                      <Download size={12} aria-hidden="true" /> Sauvegarder
-                    </button>
-                    <label className="flex items-center gap-2 px-3 py-2 min-h-[44px] text-[10px] uppercase font-bold tracking-wider text-stone-300 hover:text-amber-300 hover:bg-stone-800 rounded transition-all cursor-pointer whitespace-nowrap focus-within:ring-2 focus-within:ring-amber-500/70">
-                      <Upload size={12} aria-hidden="true" /> Charger
-                      <input type="file" accept=".json,application/json" onChange={handleImportData} className="sr-only" aria-label="Charger une sauvegarde JSON" />
-                    </label>
-                  </div>
+                  <details className="relative w-full md:w-auto">
+                    <summary className="flex items-center gap-2 px-4 py-2 min-h-[44px] text-[11px] uppercase font-bold tracking-wider text-stone-300 hover:text-amber-300 bg-stone-950/60 hover:bg-stone-800 rounded border border-stone-600 transition-all whitespace-nowrap cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                      <Settings2 size={14} aria-hidden="true" /> Gestion
+                      <ChevronDown size={12} className="ml-auto md:ml-1 opacity-70" aria-hidden="true" />
+                    </summary>
+                    <div className="absolute left-0 top-full mt-2 z-40 flex flex-col gap-1 p-2 bg-stone-900 border border-stone-600 rounded-lg shadow-2xl w-full md:w-56">
+                      <label className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] text-[11px] uppercase font-bold tracking-wider text-stone-200 hover:text-amber-300 hover:bg-stone-800 rounded transition-all cursor-pointer focus-within:ring-2 focus-within:ring-amber-500/70">
+                        <Upload size={14} aria-hidden="true" /> Charger une sauvegarde
+                        <input type="file" accept=".json,application/json" onChange={handleImportData} className="sr-only" aria-label="Charger une sauvegarde JSON" />
+                      </label>
+                      <button type="button" onClick={handleExportData} className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] text-[11px] uppercase font-bold tracking-wider text-stone-200 hover:text-amber-300 hover:bg-stone-800 rounded transition-all text-left">
+                        <Download size={14} aria-hidden="true" /> Sauvegarder
+                      </button>
+                      <div className="h-px bg-stone-700 my-1" aria-hidden="true"></div>
+                      <button type="button" onClick={handleResetAllStock} className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] text-[11px] uppercase font-bold tracking-wider text-red-300 hover:text-red-200 hover:bg-red-950/40 rounded transition-all text-left">
+                        <Trash2 size={14} aria-hidden="true" /> Réinitialiser le stock
+                      </button>
+                    </div>
+                  </details>
 
                   <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                     <SearchInput value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onClear={() => setSearchQuery('')} />
@@ -2291,7 +2292,7 @@ export default function WhiskyBarApp() {
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 box-shadow-glow" title="Ajouté manuellement" aria-label="Ajouté manuellement"></span>
                           )}
                         </div>
-                        <p className="text-[10px] text-stone-300 uppercase tracking-wider font-medium pl-8">{whisky.type} • {whisky.region}</p>
+                        <p className="text-[11px] text-stone-300 uppercase tracking-wider font-medium pl-8">{whisky.type} • {whisky.region}</p>
                       </div>
 
                       <div className="hidden md:flex items-center gap-2">
@@ -2302,7 +2303,7 @@ export default function WhiskyBarApp() {
                                {[...Array(Math.floor(whisky.peatLevel))].map((_, i) => <div key={i} className="w-1 h-3 bg-stone-500 rounded-sm"></div>)}
                              </div>
                            </div>
-                        ) : <span className="text-[10px] text-stone-300 uppercase tracking-widest">Non tourbé</span>}
+                        ) : <span className="text-[11px] text-stone-300 uppercase tracking-widest">Non tourbé</span>}
                       </div>
 
                       <div className="flex justify-end items-center gap-2 opacity-100 transition-all">
@@ -2378,13 +2379,13 @@ export default function WhiskyBarApp() {
                           <ColorBadge color={whisky.color} />
                           <div className="min-w-0">
                             <p className="font-serif text-lg text-stone-100 truncate">{whisky.name}</p>
-                            <p className="text-[10px] text-stone-300 uppercase tracking-wider">{whisky.type} • {whisky.region}</p>
+                            <p className="text-[11px] text-stone-300 uppercase tracking-wider">{whisky.type} • {whisky.region}</p>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => addToOrder(whisky.id)}
-                          className="shrink-0 flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-amber-900/20 border border-amber-700/50 rounded hover:bg-amber-900/40 text-amber-300 text-[10px] font-bold uppercase tracking-widest transition-colors"
+                          className="shrink-0 flex items-center gap-2 px-4 py-2.5 min-h-[44px] bg-amber-900/20 border border-amber-700/50 rounded hover:bg-amber-900/40 text-amber-300 text-[11px] font-bold uppercase tracking-widest transition-colors"
                         >
                           <ShoppingCart size={14} aria-hidden="true" /> Commander
                         </button>
@@ -2416,7 +2417,7 @@ export default function WhiskyBarApp() {
                             <ColorBadge color={whisky.color} />
                             <div className="min-w-0">
                               <p className="font-serif text-lg text-stone-100 truncate">{whisky.name}</p>
-                              <p className="text-[10px] text-stone-300 uppercase tracking-wider">{whisky.type} • {whisky.region} • En cave : {whisky.qty}</p>
+                              <p className="text-[11px] text-stone-300 uppercase tracking-wider">{whisky.type} • {whisky.region} • En cave : {whisky.qty}</p>
                             </div>
                           </div>
                           <div className="shrink-0 flex items-center gap-1">
@@ -2493,15 +2494,15 @@ export default function WhiskyBarApp() {
                   <div className="flex flex-wrap justify-center gap-6 text-center">
                     <div className="px-6 py-3 rounded border border-stone-600/60 bg-[var(--whisky-panel)]">
                       <p className="text-2xl font-serif text-stone-100">{partyGuests.length}</p>
-                      <p className="text-[10px] uppercase tracking-widest text-stone-300 font-bold">Invité{partyGuests.length > 1 ? 's' : ''}</p>
+                      <p className="text-[11px] uppercase tracking-widest text-stone-300 font-bold">Invité{partyGuests.length > 1 ? 's' : ''}</p>
                     </div>
                     <div className="px-6 py-3 rounded border border-amber-700/60 bg-amber-950/20">
                       <p className="text-2xl font-serif text-amber-300">{pendingGuestCount}</p>
-                      <p className="text-[10px] uppercase tracking-widest text-amber-400 font-bold">À servir</p>
+                      <p className="text-[11px] uppercase tracking-widest text-amber-400 font-bold">À servir</p>
                     </div>
                     <div className="px-6 py-3 rounded border border-green-800/60 bg-green-950/20">
                       <p className="text-2xl font-serif text-green-400">{partyGuests.length - pendingGuestCount}</p>
-                      <p className="text-[10px] uppercase tracking-widest text-green-500 font-bold">Servi{partyGuests.length - pendingGuestCount > 1 ? 's' : ''}</p>
+                      <p className="text-[11px] uppercase tracking-widest text-green-500 font-bold">Servi{partyGuests.length - pendingGuestCount > 1 ? 's' : ''}</p>
                     </div>
                   </div>
 
@@ -2550,7 +2551,7 @@ export default function WhiskyBarApp() {
                                 <span className="font-serif text-lg text-amber-200">{whiskyNameById(guest.whiskyId)}</span>
                               )}
                             </div>
-                            <p className="text-[10px] text-stone-300 uppercase tracking-wider mt-1">
+                            <p className="text-[11px] text-stone-300 uppercase tracking-wider mt-1">
                               Choisi à {formatTime(guest.chosenAt)}
                               {guest.status === 'served' && guest.servedAt ? ` • servi à ${formatTime(guest.servedAt)}` : ''}
                             </p>
@@ -2560,7 +2561,7 @@ export default function WhiskyBarApp() {
                               type="button"
                               onClick={() => toggleGuestServed(guest.id)}
                               aria-pressed={guest.status === 'served'}
-                              className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded text-[10px] font-bold uppercase tracking-widest border transition-colors ${
+                              className={`flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded text-[11px] font-bold uppercase tracking-widest border transition-colors ${
                                 guest.status === 'served'
                                   ? 'border-green-800/60 bg-green-950/20 text-green-400 hover:bg-green-950/40'
                                   : 'border-amber-600 bg-amber-500 text-black hover:bg-amber-400'
