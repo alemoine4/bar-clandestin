@@ -11,9 +11,10 @@ import {
 // ═══════════════════════════════════════════════════════════════
 // CONSTANTES & CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
-const WEIGHT_PROFILE = 3; 
+const WEIGHT_PROFILE = 3;
 const WEIGHT_MOOD = 4;
-const DEBOUNCE_DELAY = 300; 
+const WEIGHT_FAVORITE = 2;
+const DEBOUNCE_DELAY = 300;
 const TOAST_DURATION = 4000;
 const MAX_IMPORT_SIZE = 1024 * 1024;
 const MAX_QTY = 99;
@@ -87,6 +88,8 @@ function useLocalStorage(key, initialValue) {
         return valueToStore;
       } catch (error) {
         console.error(`Erreur écriture LS ${key}`, error);
+        // Prévenir l'app (quota plein, mode privé…) pour un retour visible à l'utilisateur.
+        if (isBrowser) window.dispatchEvent(new CustomEvent('ls-write-error', { detail: { key } }));
         return prev;
       }
     });
@@ -119,6 +122,17 @@ const shuffleWhiskies = (items) => {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
+};
+
+// Moteur de score unique, partagé par le Sommelier et le Kiosque (fin de la logique dupliquée).
+// Pondération : ambiance (×WEIGHT_MOOD) > arôme (×WEIGHT_PROFILE) ; bonus favori optionnel.
+// `baseScore` exclut le bonus favori → sert au calcul du % de correspondance sans le gonfler.
+const scoreWhisky = (whisky, selectedProfiles = [], selectedMoods = [], { favoriteBonus = false } = {}) => {
+  const profileMatches = (whisky.profile || []).filter(p => selectedProfiles.includes(p));
+  const moodMatches = (whisky.mood || []).filter(m => selectedMoods.includes(m));
+  const baseScore = profileMatches.length * WEIGHT_PROFILE + moodMatches.length * WEIGHT_MOOD;
+  const score = baseScore + (favoriteBonus && whisky.isFavorite ? WEIGHT_FAVORITE : 0);
+  return { profileMatches, moodMatches, baseScore, score };
 };
 
 const isQuantityMap = (value) =>
@@ -160,14 +174,12 @@ const validateBackupData = (data) => {
   return [data.customWhiskies, data.stock, data.stockQty, data.order, data.favorites, data.party].some(v => v !== undefined);
 };
 
-// Migration V1 → V2 : l'ancien statut booléen devient une quantité (true → 1, false → 0).
-// Ne s'applique que si aucune donnée V2 n'existe ; la clé V1 n'est jamais réécrite.
+// Valeur initiale du stock V2 = migration de l'ancien statut V1 (true → 1, false → 0), sinon {}.
+// Sert uniquement quand la clé V2 est absente : useLocalStorage lit whisky_v2_stock_qty s'il existe
+// (inutile de le relire ici). La clé V1 n'est jamais réécrite.
 const readInitialStock = () => {
   if (!isBrowser) return {};
   try {
-    if (window.localStorage.getItem(V2_STOCK_KEY) !== null) {
-      return JSON.parse(window.localStorage.getItem(V2_STOCK_KEY));
-    }
     const legacy = window.localStorage.getItem(V1_STOCK_KEY);
     if (legacy) {
       const owned = JSON.parse(legacy);
@@ -718,6 +730,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   const [step, setStep] = useState('name');
   const [guestName, setGuestName] = useState('');
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, DEBOUNCE_DELAY);
   const [selectedTags, setSelectedTags] = useState([]);
   const [showAllFilters, setShowAllFilters] = useState(false);
   const isTagActive = (type, id) => selectedTags.some(t => t.type === type && t.id === id);
@@ -800,25 +813,20 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   const hasHiddenFilters = kioskFilterGroups.moods.length > FEATURED_COUNT || kioskFilterGroups.profiles.length > FEATURED_COUNT;
 
   const filteredWhiskies = useMemo(() => {
-    const q = normalizeText(search);
+    const q = normalizeText(debouncedSearch);
     const bySearch = whiskies.filter(w => !q
       || normalizeText(w.name).includes(q) || normalizeText(w.type).includes(q) || normalizeText(w.region).includes(q));
     if (selectedTags.length === 0) return bySearch;
-    // Même logique que le Sommelier : une bouteille apparaît si elle matche AU MOINS un filtre,
-    // classée par nombre de correspondances (jamais de résultat vide à cause d'un ET trop strict).
+    // Même moteur de score que le Sommelier (scoreWhisky) : une bouteille apparaît si elle
+    // matche AU MOINS un filtre, classée par pertinence (jamais de résultat vide, pas de ET strict).
+    const selProfiles = selectedTags.filter(t => t.type === 'profile').map(t => t.id);
+    const selMoods = selectedTags.filter(t => t.type === 'mood').map(t => t.id);
     return bySearch
-      .map(w => {
-        let score = 0;
-        selectedTags.forEach(t => {
-          const field = t.type === 'mood' ? (w.mood || []) : (w.profile || []);
-          if (field.includes(t.id)) score += 1;
-        });
-        return { w, score };
-      })
+      .map(w => ({ w, score: scoreWhisky(w, selProfiles, selMoods, { favoriteBonus: true }).score }))
       .filter(x => x.score > 0)
       .sort((a, b) => b.score - a.score)
       .map(x => x.w);
-  }, [whiskies, search, selectedTags]);
+  }, [whiskies, debouncedSearch, selectedTags]);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
@@ -884,6 +892,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                   value={guestName}
                   onChange={e => setGuestName(e.target.value)}
                   placeholder="Ton prénom..."
+                  maxLength={40}
                   autoComplete="off"
                   autoFocus
                   enterKeyHint="go"
@@ -1180,7 +1189,7 @@ const AddWhiskyForm = ({ onAdd, onCancel, initialWhisky = null }) => {
     <form onSubmit={handleSubmit} className="space-y-8">
       <div>
         <label htmlFor="whisky-name" className={labelClass}>Nom de la bouteille</label>
-        <input id="whisky-name" name="name" className={inputClass} value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Ex: Lagavulin 16, Nikka..." autoFocus required aria-required="true" />
+        <input id="whisky-name" name="name" className={inputClass} value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="Ex: Lagavulin 16, Nikka..." maxLength={80} autoFocus required aria-required="true" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -1509,7 +1518,15 @@ export default function WhiskyBarApp() {
     toastTimersRef.current.delete(id);
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
-  
+
+  // A1 — retour visible si une écriture localStorage échoue (quota plein, navigation privée…).
+  useEffect(() => {
+    if (!isBrowser) return undefined;
+    const onWriteError = () => addToast("Sauvegarde impossible : stockage plein ou indisponible", "error");
+    window.addEventListener('ls-write-error', onWriteError);
+    return () => window.removeEventListener('ls-write-error', onWriteError);
+  }, [addToast]);
+
   const [customWhiskies, setCustomWhiskies] = useLocalStorage('whisky_custom_bottles', []);
   const initialStockRef = useRef(null);
   if (initialStockRef.current === null) initialStockRef.current = readInitialStock();
@@ -1672,7 +1689,16 @@ export default function WhiskyBarApp() {
       try {
         const json = JSON.parse(e.target.result);
         if (validateBackupData(json)) {
-          if (json.customWhiskies) setCustomWhiskies(json.customWhiskies.map(w => ({ ...w, isCustom: true })));
+          if (json.customWhiskies) {
+            // A2 — garantir des ids uniques et distincts du catalogue par défaut
+            // (une collision « default-* » ou un doublon casserait les clés React / les lookups).
+            const reservedIds = new Set(DEFAULT_WHISKIES.map(w => w.id));
+            setCustomWhiskies(json.customWhiskies.map(w => {
+              const id = (reservedIds.has(w.id)) ? `custom-${generateId()}` : w.id;
+              reservedIds.add(id);
+              return { ...w, id, isCustom: true };
+            }));
+          }
           if (json.stockQty) setStockQty(json.stockQty);
           else if (json.stock) setStockQty(Object.fromEntries(Object.entries(json.stock).map(([id, v]) => [id, v ? 1 : 0])));
           if (json.order) setOrderList(json.order);
@@ -1927,24 +1953,14 @@ export default function WhiskyBarApp() {
     return allWhiskies
       .filter(w => w.owned)
       .map(whisky => {
-        let score = 0;
-        let reasons = [];
-        
-        const profileMatches = (whisky.profile || []).filter(p => selectedProfiles.includes(p));
-        score += profileMatches.length * WEIGHT_PROFILE;
+        const { profileMatches, moodMatches, baseScore, score } = scoreWhisky(whisky, selectedProfiles, selectedMoods, { favoriteBonus: true });
+        const reasons = [];
         if (profileMatches.length > 0) reasons.push(`Arômes: ${profileMatches.join(', ')}`);
-        
-        const moodMatches = (whisky.mood || []).filter(m => selectedMoods.includes(m));
-        score += moodMatches.length * WEIGHT_MOOD;
         if (moodMatches.length > 0) reasons.push(`Ambiance: ${moodMatches.map(m => MOODS.find(mo => mo.id === m)?.label).join(', ')}`);
-        
-        const maxScore = (selectedProfiles.length * WEIGHT_PROFILE) + (selectedMoods.length * WEIGHT_MOOD);
-        const matchPercentage = maxScore > 0 ? Math.round((score / maxScore) * 100) : 0;
+        if (whisky.isFavorite && score > baseScore) reasons.push("Favori");
 
-        if (whisky.isFavorite) {
-          score += 2;
-          reasons.push("Favori");
-        }
+        const maxScore = (selectedProfiles.length * WEIGHT_PROFILE) + (selectedMoods.length * WEIGHT_MOOD);
+        const matchPercentage = maxScore > 0 ? Math.round((baseScore / maxScore) * 100) : 0;
 
         return { ...whisky, score, matchPercentage, reasons };
       })
@@ -2316,6 +2332,7 @@ export default function WhiskyBarApp() {
               </div>
 
               {/* List */}
+              <h2 className="sr-only">Ma cave</h2>
               <div className="grid grid-cols-1 gap-2">
                 {sortedCollection.map(whisky => (
                     <article 
@@ -2353,9 +2370,9 @@ export default function WhiskyBarApp() {
                       <div className="md:col-span-2">
                         <div className="flex items-center gap-3 mb-1">
                           <ColorBadge color={whisky.color} />
-                          <h4 className={`font-serif text-lg truncate ${whisky.owned ? 'text-stone-100' : 'text-stone-300'}`}>
+                          <h3 className={`font-serif text-lg truncate ${whisky.owned ? 'text-stone-100' : 'text-stone-300'}`}>
                             {whisky.name}
-                          </h4>
+                          </h3>
                           {whisky.isCustom && (
                             <span className="w-1.5 h-1.5 rounded-full bg-blue-400 box-shadow-glow" title="Ajouté manuellement" aria-label="Ajouté manuellement"></span>
                           )}
