@@ -1317,7 +1317,7 @@ const RecommendationCard = ({ whisky, matchScore, isRandomPick, onFavorite, isFa
           <h2 className="text-4xl md:text-6xl font-thin text-[var(--whisky-highlight)] mb-2 tracking-normal font-serif z-10 relative break-words">
             {whisky.name}
           </h2>
-          <div className="h-px w-24 bg-amber-800 mx-auto mt-6" aria-hidden="true"></div>
+          <div className="h-px w-32 bg-gradient-to-r from-transparent via-[#d4af37]/70 to-transparent mx-auto mt-6" aria-hidden="true"></div>
         </div>
         
         <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-10 text-xs tracking-widest uppercase text-stone-300 font-bold">
@@ -2028,7 +2028,7 @@ export default function WhiskyBarApp() {
           <h1 className="text-5xl md:text-7xl font-thin text-[var(--whisky-gold)] mb-4 tracking-normal font-serif drop-shadow-sm">
             Le Bar Clandestin
           </h1>
-          <div className="h-px w-32 bg-amber-800 mb-6" aria-hidden="true"></div>
+          <div className="h-px w-40 bg-gradient-to-r from-transparent via-[#d4af37]/70 to-transparent mb-6" aria-hidden="true"></div>
           <p className="text-stone-300 text-sm tracking-[0.22em] uppercase font-medium">
             Collection Privée • {totalOwned} Référence{totalOwned > 1 ? 's' : ''} • {totalBottles} Bouteille{totalBottles > 1 ? 's' : ''} en Cave
           </p>
