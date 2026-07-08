@@ -3,7 +3,9 @@ import {
   Flame, Wine, Search, X, ChevronDown,
   CheckCircle2, AlertCircle, ArrowUpDown, Star, RefreshCw, List, ArrowLeft,
   Share2, Trash2, Heart, Download, Upload, Plus, GlassWater, Sparkles, Pencil,
-  ShoppingCart, Minus, Copy, PackageCheck, Martini
+  ShoppingCart, Minus, Copy, PackageCheck, Martini,
+  Moon, Armchair, Zap, Cake, Compass, Users, Beef, Mountain,
+  Candy, Apple, IceCream, TreePine, Hexagon, Waves, Flower2, Cookie
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -381,33 +383,36 @@ const DEFAULT_WHISKIES = [
   }
 ];
 
+// Icônes Lucide (monochromes) plutôt que des emoji multicolores dépendants de l'OS,
+// pour un rendu premium et cohérent avec la navigation. Certains arômes sont des approximations
+// (Lucide n'a pas d'icône « sherry » ou « miel » dédiée).
 const TASTE_PROFILES = [
-  { id: "fumé", label: "Fumé", emoji: "🔥" },
-  { id: "tourbé", label: "Tourbé", emoji: "🏔️" },
-  { id: "doux", label: "Doux", emoji: "🍯" },
-  { id: "épicé", label: "Épicé", emoji: "🌶️" },
-  { id: "fruité", label: "Fruité", emoji: "🍎" },
-  { id: "vanille", label: "Vanille", emoji: "🍦" },
-  { id: "sherry", label: "Sherry", emoji: "🍷" },
-  { id: "boisé", label: "Boisé", emoji: "🪵" },
-  { id: "miel", label: "Miel", emoji: "🐝" },
-  { id: "maritime", label: "Maritime", emoji: "🌊" },
-  { id: "floral", label: "Floral", emoji: "🌸" },
-  { id: "chocolat", label: "Chocolat", emoji: "🍫" },
+  { id: "fumé", label: "Fumé", Icon: Flame },
+  { id: "tourbé", label: "Tourbé", Icon: Mountain },
+  { id: "doux", label: "Doux", Icon: Candy },
+  { id: "épicé", label: "Épicé", Icon: Zap },
+  { id: "fruité", label: "Fruité", Icon: Apple },
+  { id: "vanille", label: "Vanille", Icon: IceCream },
+  { id: "sherry", label: "Sherry", Icon: Wine },
+  { id: "boisé", label: "Boisé", Icon: TreePine },
+  { id: "miel", label: "Miel", Icon: Hexagon },
+  { id: "maritime", label: "Maritime", Icon: Waves },
+  { id: "floral", label: "Floral", Icon: Flower2 },
+  { id: "chocolat", label: "Chocolat", Icon: Cookie },
 ];
 
 const MOODS = [
-  { id: "apéritif", label: "Apéritif", emoji: "🥂" },
-  { id: "digestif", label: "Digestif", emoji: "🌙" },
-  { id: "décontracté", label: "Décontracté", emoji: "😌" },
-  { id: "intense", label: "Intense", emoji: "⚡" },
-  { id: "cosy", label: "Cosy", emoji: "🔥" },
-  { id: "gourmand", label: "Gourmand", emoji: "🍰" },
-  { id: "découverte", label: "Découverte", emoji: "🗺️" },
-  { id: "convivial", label: "Convivial", emoji: "👥" },
-  { id: "cocktail", label: "Cocktail", emoji: "🍸" },
-  { id: "barbecue", label: "Barbecue", emoji: "🍖" },
-  { id: "aventure", label: "Aventure", emoji: "🧭" }
+  { id: "apéritif", label: "Apéritif", Icon: GlassWater },
+  { id: "digestif", label: "Digestif", Icon: Moon },
+  { id: "décontracté", label: "Décontracté", Icon: Armchair },
+  { id: "intense", label: "Intense", Icon: Zap },
+  { id: "cosy", label: "Cosy", Icon: Flame },
+  { id: "gourmand", label: "Gourmand", Icon: Cake },
+  { id: "découverte", label: "Découverte", Icon: Compass },
+  { id: "convivial", label: "Convivial", Icon: Users },
+  { id: "cocktail", label: "Cocktail", Icon: Martini },
+  { id: "barbecue", label: "Barbecue", Icon: Beef },
+  { id: "aventure", label: "Aventure", Icon: Mountain }
 ];
 
 const WHISKY_TYPES = [
@@ -496,21 +501,26 @@ const SearchInput = ({ value, onChange, onClear, label = "Rechercher une bouteil
   );
 };
 
-const FilterButton = React.memo(({ active, onClick, icon, label }) => (
+const FilterButton = React.memo(({ active, onClick, Icon, label, className = '' }) => (
   <button
     type="button"
     aria-pressed={active}
     aria-label={`${active ? 'Retirer' : 'Ajouter'} le filtre ${label}`}
     onClick={onClick}
-    className={`flex flex-col items-center gap-3 p-5 rounded-sm transition-all duration-300 border group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--whisky-bg)]
-      ${active 
-        ? 'bg-stone-900 border-amber-500 text-amber-300 shadow-[0_4px_20px_-8px_rgba(245,158,11,0.55)]' 
+    className={`flex flex-col items-center gap-3 p-5 rounded-sm transition-all duration-300 border group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--whisky-bg)] ${className}
+      ${active
+        ? 'bg-stone-900 border-amber-500 text-amber-300 shadow-[0_4px_20px_-8px_rgba(245,158,11,0.55)]'
         : 'bg-stone-900/40 border-stone-600/60 hover:bg-stone-800/50 hover:border-stone-500'
       }`}
   >
-    <span className={`text-2xl filter transition-transform duration-300 ${active ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'grayscale-[35%] opacity-80 group-hover:grayscale-0 group-hover:opacity-100'}`}>
-      {icon}
-    </span>
+    {Icon && (
+      <Icon
+        size={26}
+        strokeWidth={1.5}
+        className={`transition-all duration-300 ${active ? 'text-amber-400 scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'text-stone-300 group-hover:text-amber-200'}`}
+        aria-hidden="true"
+      />
+    )}
     <span className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${active ? 'text-amber-300 font-bold' : 'text-stone-200 group-hover:text-white'}`}>
       {label}
     </span>
@@ -742,19 +752,28 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     ? (whiskies.find(w => w.id === currentGuest.whiskyId)?.name || null)
     : null;
 
-  const kioskProfiles = useMemo(() => {
-    const freq = new Map();
-    whiskies.forEach(w => (w.profile || []).forEach(p => freq.set(p, (freq.get(p) || 0) + 1)));
-    return [...freq.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([id]) => TASTE_PROFILES.find(t => t.id === id) || { id, label: id, emoji: '🥃' });
+  // Filtres invité : les ambiances les plus présentes dans la cave (grand public) + quelques arômes clés,
+  // dérivés du stock. Chaque filtre porte son type pour savoir dans quel champ chercher.
+  const kioskFilters = useMemo(() => {
+    // Ne garder que les ambiances/arômes du référentiel curé (les bouteilles peuvent porter
+    // des tags libres comme « soirée » ou « hiver » qu'on n'expose pas aux invités).
+    const topFrom = (key, catalogue, type, n) => {
+      const known = new Set(catalogue.map(c => c.id));
+      const freq = new Map();
+      whiskies.forEach(w => (w[key] || []).forEach(v => { if (known.has(v)) freq.set(v, (freq.get(v) || 0) + 1); }));
+      return [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, n)
+        .map(([id]) => ({ type, ...catalogue.find(c => c.id === id) }));
+    };
+    return [...topFrom('mood', MOODS, 'mood', 4), ...topFrom('profile', TASTE_PROFILES, 'profile', 4)];
   }, [whiskies]);
 
   const filteredWhiskies = useMemo(() => {
     const q = normalizeText(search);
     return whiskies.filter(w => {
-      if (filter && !(w.profile || []).includes(filter)) return false;
+      if (filter) {
+        const field = filter.type === 'mood' ? (w.mood || []) : (w.profile || []);
+        if (!field.includes(filter.id)) return false;
+      }
       if (!q) return true;
       return normalizeText(w.name).includes(q) || normalizeText(w.type).includes(q) || normalizeText(w.region).includes(q);
     });
@@ -880,27 +899,30 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 )}
               </div>
 
-              {kioskProfiles.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-2 mb-6">
+              {kioskFilters.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mb-6 max-w-3xl mx-auto">
                   <button
                     type="button"
                     aria-pressed={!filter}
                     onClick={() => setFilter(null)}
-                    className={`px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${!filter ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
+                    className={`inline-flex items-center gap-2 px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${!filter ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
                   >
-                    🥃 Tout
+                    <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Tout
                   </button>
-                  {kioskProfiles.map(p => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      aria-pressed={filter === p.id}
-                      onClick={() => setFilter(prev => prev === p.id ? null : p.id)}
-                      className={`px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${filter === p.id ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
-                    >
-                      {p.emoji} {p.label}
-                    </button>
-                  ))}
+                  {kioskFilters.map(f => {
+                    const isActive = filter?.type === f.type && filter?.id === f.id;
+                    return (
+                      <button
+                        key={`${f.type}-${f.id}`}
+                        type="button"
+                        aria-pressed={isActive}
+                        onClick={() => setFilter(prev => (prev?.type === f.type && prev?.id === f.id) ? null : { type: f.type, id: f.id })}
+                        className={`inline-flex items-center gap-2 px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${isActive ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
+                      >
+                        <f.Icon size={16} strokeWidth={1.5} aria-hidden="true" /> {f.label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
 
@@ -948,8 +970,8 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                       <div className="flex items-center justify-between gap-3 flex-wrap">
                         <span className="flex flex-wrap gap-1.5">
                           {chips.map(c => (
-                            <span key={c.id} className="px-2.5 py-1 rounded-full bg-stone-800/80 border border-stone-600 text-stone-200 text-xs">
-                              {c.emoji} {c.label}
+                            <span key={c.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-800/80 border border-stone-600 text-stone-200 text-xs">
+                              <c.Icon size={13} strokeWidth={1.5} className="text-amber-300/80" aria-hidden="true" /> {c.label}
                             </span>
                           ))}
                         </span>
@@ -1099,7 +1121,7 @@ const AddWhiskyForm = ({ onAdd, onCancel, initialWhisky = null }) => {
         <div className="flex flex-wrap gap-2">
           {TASTE_PROFILES.map(p => (
             <button key={p.id} type="button" aria-pressed={form.profile.includes(p.id)} onClick={() => toggleInList('profile', p.id)} className={chipClass(form.profile.includes(p.id))}>
-              <span aria-hidden="true">{p.emoji}</span> {p.label}
+              <p.Icon size={14} strokeWidth={1.5} aria-hidden="true" /> {p.label}
             </button>
           ))}
         </div>
@@ -1110,7 +1132,7 @@ const AddWhiskyForm = ({ onAdd, onCancel, initialWhisky = null }) => {
         <div className="flex flex-wrap gap-2">
           {MOODS.map(m => (
             <button key={m.id} type="button" aria-pressed={form.mood.includes(m.id)} onClick={() => toggleInList('mood', m.id)} className={chipClass(form.mood.includes(m.id))}>
-              <span aria-hidden="true">{m.emoji}</span> {m.label}
+              <m.Icon size={14} strokeWidth={1.5} aria-hidden="true" /> {m.label}
             </button>
           ))}
         </div>
@@ -1962,9 +1984,16 @@ export default function WhiskyBarApp() {
                         <h2 className="text-stone-200 text-xs tracking-[0.28em] uppercase font-bold text-center">Choisissez l'ambiance</h2>
                         <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-w-5xl mx-auto">
+                      <div className="flex flex-wrap justify-center gap-3 max-w-5xl mx-auto">
                         {MOODS.map(mood => (
-                          <FilterButton key={mood.id} active={selectedMoods.includes(mood.id)} onClick={() => toggleMood(mood.id)} icon={mood.emoji} label={mood.label} />
+                          <FilterButton
+                            key={mood.id}
+                            active={selectedMoods.includes(mood.id)}
+                            onClick={() => toggleMood(mood.id)}
+                            Icon={mood.Icon}
+                            label={mood.label}
+                            className="w-[calc(50%-0.375rem)] sm:w-[152px]"
+                          />
                         ))}
                       </div>
                     </div>
@@ -1991,7 +2020,7 @@ export default function WhiskyBarApp() {
                                   ? 'bg-amber-950/50 border-amber-500 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                                   : 'bg-stone-900/40 border-stone-600 text-stone-200 hover:border-amber-600/60 hover:text-stone-50'}`}
                             >
-                              <Flame size={18} className={selectedProfiles.includes(id) ? 'fill-amber-500 text-amber-500' : 'text-stone-300 group-hover:text-stone-300'} aria-hidden="true" />
+                              {profile?.Icon && <profile.Icon size={18} strokeWidth={1.5} className={selectedProfiles.includes(id) ? 'text-amber-400' : 'text-stone-300 group-hover:text-amber-200'} aria-hidden="true" />}
                               <span className="uppercase tracking-[0.2em] text-xs font-bold">{profile?.label}</span>
                             </button>
                           );
@@ -2006,13 +2035,13 @@ export default function WhiskyBarApp() {
                             key={profile.id}
                             aria-pressed={selectedProfiles.includes(profile.id)}
                             onClick={() => toggleProfile(profile.id)}
-                            className={`px-4 py-2.5 min-h-[44px] md:min-h-[52px] rounded-full text-[10px] md:text-xs uppercase tracking-wider font-bold border transition-all duration-300 ${
+                            className={`px-4 py-2.5 min-h-[44px] md:min-h-[52px] rounded-full text-[10px] md:text-xs uppercase tracking-wider font-bold border transition-all duration-300 inline-flex items-center justify-center gap-2 ${
                               selectedProfiles.includes(profile.id)
                                 ? 'bg-amber-900/30 border-amber-600 text-amber-300'
                                 : 'bg-stone-900/40 border-stone-600 text-stone-200 hover:border-amber-600/60 hover:text-stone-50'
                             }`}
                           >
-                            <span aria-hidden="true" className="mr-1.5">{profile.emoji}</span>{profile.label}
+                            <profile.Icon size={15} strokeWidth={1.5} className={selectedProfiles.includes(profile.id) ? 'text-amber-400' : 'text-stone-300'} aria-hidden="true" />{profile.label}
                           </button>
                         ))}
                       </div>
