@@ -2024,7 +2024,7 @@ export default function WhiskyBarApp() {
             alt="Le Bar Clandestin"
             width="512"
             height="512"
-            className="w-36 h-36 md:w-44 md:h-44 rounded-[22%] border border-amber-800/40 shadow-[0_15px_45px_-12px_rgba(0,0,0,0.9),0_0_35px_-5px_rgba(212,175,55,0.2)] mb-8"
+            className="w-44 h-44 md:w-56 md:h-56 rounded-[22%] border border-amber-800/40 shadow-[0_15px_45px_-12px_rgba(0,0,0,0.9),0_0_35px_-5px_rgba(212,175,55,0.2)] mb-8"
           />
           <div className="h-px w-32 bg-amber-800 mb-6" aria-hidden="true"></div>
           <p className="text-stone-300 text-sm tracking-[0.22em] uppercase font-medium">
