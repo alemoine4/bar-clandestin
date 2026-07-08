@@ -920,7 +920,8 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
               </div>
 
               {(kioskFilterGroups.moods.length > 0 || kioskFilterGroups.profiles.length > 0) && (() => {
-                const chipClass = (isActive) => `inline-flex items-center gap-2 px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${isActive ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`;
+                // Gabarit uniforme : largeur fixe pour aligner les puces d'une même catégorie.
+                const chipBase = (isActive, extra = '') => `inline-flex items-center justify-center gap-2 px-4 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${extra} ${isActive ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`;
                 const renderGroup = (label, items, type) => {
                   if (items.length === 0) return null;
                   let shown = showAllFilters ? items : items.slice(0, FEATURED_COUNT);
@@ -940,7 +941,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                               type="button"
                               aria-pressed={active}
                               onClick={() => toggleTag(type, f.id)}
-                              className={chipClass(active)}
+                              className={chipBase(active, 'w-[calc(50%-0.25rem)] sm:w-40')}
                             >
                               <f.Icon size={16} strokeWidth={1.5} aria-hidden="true" /> {f.label}
                             </button>
@@ -953,7 +954,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 return (
                   <div className="mb-6 max-w-3xl mx-auto space-y-5">
                     <div className="flex justify-center">
-                      <button type="button" aria-pressed={selectedTags.length === 0} onClick={() => setSelectedTags([])} className={chipClass(selectedTags.length === 0)}>
+                      <button type="button" aria-pressed={selectedTags.length === 0} onClick={() => setSelectedTags([])} className={chipBase(selectedTags.length === 0, 'w-40')}>
                         <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Tout
                       </button>
                     </div>
