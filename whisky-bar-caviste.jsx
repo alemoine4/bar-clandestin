@@ -788,11 +788,21 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     <div
       ref={screenRef}
       tabIndex={-1}
-      className="fixed inset-0 z-50 bg-[var(--whisky-bg)] overflow-auto animate-fadeIn custom-scrollbar focus-visible:outline-none"
+      className="fixed inset-0 z-50 bg-[var(--whisky-bg)] overflow-auto custom-scrollbar focus-visible:outline-none"
     >
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50vw] h-[45vh] bg-amber-600/5 blur-[80px] rounded-full pointer-events-none" aria-hidden="true" />
 
-      <div className="relative z-10 max-w-3xl mx-auto px-6 py-14 md:py-20 text-center min-h-screen flex flex-col">
+      <button
+        type="button"
+        onClick={onExit}
+        className="fixed top-4 right-4 z-[60] p-2 min-h-[48px] min-w-[48px] inline-flex items-center justify-center rounded-full border border-stone-600 bg-black/70 text-stone-200 hover:text-amber-300 hover:border-amber-500 shadow-lg transition-colors"
+        aria-label="Fermer le mode invité et revenir au barman"
+        title="Fermer (barman)"
+      >
+        <X size={22} aria-hidden="true" />
+      </button>
+
+      <div className="relative z-10 max-w-3xl mx-auto px-6 py-14 md:py-20 text-center min-h-screen flex flex-col animate-fadeIn">
         <div className="flex-1">
           <img src="logo.jpg" alt="" width="512" height="512" className="w-20 h-20 mx-auto rounded-[22%] border border-amber-800/40 shadow-2xl mb-6" aria-hidden="true" />
 
