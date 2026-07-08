@@ -505,13 +505,13 @@ const FilterButton = React.memo(({ active, onClick, icon, label }) => (
     className={`flex flex-col items-center gap-3 p-5 rounded-sm transition-all duration-300 border group relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--whisky-bg)]
       ${active 
         ? 'bg-stone-900 border-amber-500 text-amber-300 shadow-[0_4px_20px_-8px_rgba(245,158,11,0.55)]' 
-        : 'bg-stone-900/20 border-stone-700/50 hover:bg-stone-800/40 hover:border-stone-600'
+        : 'bg-stone-900/40 border-stone-600/60 hover:bg-stone-800/50 hover:border-stone-500'
       }`}
   >
     <span className={`text-2xl filter transition-transform duration-300 ${active ? 'scale-110 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]' : 'grayscale-[35%] opacity-80 group-hover:grayscale-0 group-hover:opacity-100'}`}>
       {icon}
     </span>
-    <span className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${active ? 'text-amber-300 font-bold' : 'text-stone-300 group-hover:text-stone-100'}`}>
+    <span className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${active ? 'text-amber-300 font-bold' : 'text-stone-200 group-hover:text-white'}`}>
       {label}
     </span>
     {active && <div className="absolute inset-0 border border-amber-500/20 rounded-sm pointer-events-none" aria-hidden="true" />}
@@ -1949,7 +1949,7 @@ export default function WhiskyBarApp() {
                     <div className="space-y-6">
                       <div className="flex items-center justify-center gap-4">
                         <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
-                        <h2 className="text-stone-300 text-xs tracking-[0.28em] uppercase font-bold text-center">Choisissez l'ambiance</h2>
+                        <h2 className="text-stone-200 text-xs tracking-[0.28em] uppercase font-bold text-center">Choisissez l'ambiance</h2>
                         <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-w-5xl mx-auto">
@@ -1962,7 +1962,7 @@ export default function WhiskyBarApp() {
                     <div className="space-y-6">
                       <div className="flex items-center justify-center gap-4">
                         <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
-                        <h2 className="text-stone-300 text-xs tracking-[0.28em] uppercase font-bold text-center">Affinez par profil</h2>
+                        <h2 className="text-stone-200 text-xs tracking-[0.28em] uppercase font-bold text-center">Affinez par profil</h2>
                         <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
                       </div>
                       
@@ -1976,10 +1976,10 @@ export default function WhiskyBarApp() {
                               key={id}
                               aria-pressed={selectedProfiles.includes(id)}
                               onClick={() => toggleProfile(id)}
-                              className={`px-8 py-3 min-h-[44px] rounded border transition-all flex items-center gap-3 group
-                                ${selectedProfiles.includes(id) 
-                                  ? 'bg-amber-950/50 border-amber-500 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.2)]' 
-                                  : 'border-stone-600 text-stone-300 hover:border-stone-500 hover:text-stone-100'}`}
+                              className={`px-8 py-3 min-h-[44px] lg:px-12 lg:py-4 rounded border transition-all flex items-center gap-3 group
+                                ${selectedProfiles.includes(id)
+                                  ? 'bg-amber-950/50 border-amber-500 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                                  : 'bg-stone-900/40 border-stone-600 text-stone-200 hover:border-amber-600/60 hover:text-stone-50'}`}
                             >
                               <Flame size={18} className={selectedProfiles.includes(id) ? 'fill-amber-500 text-amber-500' : 'text-stone-300 group-hover:text-stone-300'} aria-hidden="true" />
                               <span className="uppercase tracking-[0.2em] text-xs font-bold">{profile?.label}</span>
@@ -1989,20 +1989,20 @@ export default function WhiskyBarApp() {
                       </div>
 
                       {/* Secondary Profiles */}
-                      <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+                      <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto lg:grid lg:grid-cols-5 lg:gap-4 lg:max-w-4xl">
                         {TASTE_PROFILES.filter(p => !['tourbé', 'fumé'].includes(p.id)).map(profile => (
                           <button
                             type="button"
                             key={profile.id}
                             aria-pressed={selectedProfiles.includes(profile.id)}
                             onClick={() => toggleProfile(profile.id)}
-                            className={`px-4 py-2.5 min-h-[44px] rounded-full text-[10px] uppercase tracking-wider font-bold border transition-all duration-300 ${
-                              selectedProfiles.includes(profile.id) 
-                                ? 'bg-amber-900/30 border-amber-600 text-amber-300' 
-                                : 'bg-transparent border-stone-600 text-stone-300 hover:border-stone-500 hover:text-stone-100'
+                            className={`px-4 py-2.5 min-h-[44px] lg:min-h-[52px] rounded-full text-[10px] lg:text-xs uppercase tracking-wider font-bold border transition-all duration-300 ${
+                              selectedProfiles.includes(profile.id)
+                                ? 'bg-amber-900/30 border-amber-600 text-amber-300'
+                                : 'bg-stone-900/40 border-stone-600 text-stone-200 hover:border-amber-600/60 hover:text-stone-50'
                             }`}
                           >
-                            {profile.label}
+                            <span aria-hidden="true" className="mr-1.5">{profile.emoji}</span>{profile.label}
                           </button>
                         ))}
                       </div>
@@ -2293,7 +2293,7 @@ export default function WhiskyBarApp() {
                 <section aria-labelledby="rupture-heading">
                   <div className="flex items-center justify-center gap-4 mb-6">
                     <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
-                    <h2 id="rupture-heading" className="text-stone-300 text-xs tracking-[0.28em] uppercase font-bold text-center">En rupture dans la cave</h2>
+                    <h2 id="rupture-heading" className="text-stone-200 text-xs tracking-[0.28em] uppercase font-bold text-center">En rupture dans la cave</h2>
                     <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
                   </div>
                   <div className="grid grid-cols-1 gap-2">
@@ -2322,7 +2322,7 @@ export default function WhiskyBarApp() {
               <section aria-labelledby="bon-heading">
                 <div className="flex items-center justify-center gap-4 mb-6">
                   <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
-                  <h2 id="bon-heading" className="text-stone-300 text-xs tracking-[0.28em] uppercase font-bold text-center">Bon de commande</h2>
+                  <h2 id="bon-heading" className="text-stone-200 text-xs tracking-[0.28em] uppercase font-bold text-center">Bon de commande</h2>
                   <div className="h-px w-12 bg-stone-700" aria-hidden="true"></div>
                 </div>
 
@@ -2544,9 +2544,9 @@ export default function WhiskyBarApp() {
       <style>{`
         :root {
           --whisky-bg: #0a0705;
-          --whisky-surface: rgba(38, 28, 19, 0.93);
-          --whisky-panel: rgba(46, 33, 23, 0.92);
-          --whisky-body: #d4c5a6;
+          --whisky-surface: rgba(52, 39, 27, 0.92);
+          --whisky-panel: rgba(60, 44, 31, 0.90);
+          --whisky-body: #ded0b2;
           --whisky-cream: #e8dcc4;
           --whisky-gold: #d4af37;
           --whisky-highlight: #f4e4c8;
@@ -2559,7 +2559,7 @@ export default function WhiskyBarApp() {
           font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
           background-color: var(--whisky-bg);
           /* url relative : résolue depuis la page, fonctionne en local ET sous /<repo>/ sur GitHub Pages */
-          background-image: linear-gradient(rgba(14, 8, 4, 0.55), rgba(8, 5, 3, 0.86)), url('fond.jpg');
+          background-image: linear-gradient(rgba(26, 15, 7, 0.35), rgba(12, 7, 4, 0.72)), url('fond.jpg');
           background-size: cover;
           background-position: center;
           background-attachment: fixed;
