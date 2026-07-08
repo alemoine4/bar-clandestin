@@ -486,7 +486,7 @@ const SearchInput = ({ value, onChange, onClear, label = "Rechercher une bouteil
         id={inputId}
         ref={inputRef}
         type="text"
-        placeholder="Rechercher une bouteille..."
+        placeholder={`${label}...`}
         value={value}
         onChange={onChange}
         className={`bg-stone-900/80 border border-stone-600 text-amber-50 min-h-[48px] py-3 pl-10 pr-12 rounded text-sm focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/40 transition-all placeholder:text-stone-300 font-serif ${fullWidth ? 'w-full' : 'w-full sm:w-64'}`}
