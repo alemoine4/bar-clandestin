@@ -719,6 +719,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   const [guestName, setGuestName] = useState('');
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState(null);
+  const [showAllFilters, setShowAllFilters] = useState(false);
   const [lastChoice, setLastChoice] = useState(null);
   const screenRef = useRef(null);
   const nameId = useId();
@@ -754,18 +755,21 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
 
   // Filtres invité : les ambiances les plus présentes dans la cave (grand public) + quelques arômes clés,
   // dérivés du stock. Chaque filtre porte son type pour savoir dans quel champ chercher.
-  const kioskFilters = useMemo(() => {
-    // Ne garder que les ambiances/arômes du référentiel curé (les bouteilles peuvent porter
-    // des tags libres comme « soirée » ou « hiver » qu'on n'expose pas aux invités).
-    const topFrom = (key, catalogue, type, n) => {
+  // Filtres invité groupés par catégorie, triés par fréquence dans la cave.
+  // Restreints au référentiel curé (les bouteilles peuvent porter des tags libres
+  // type « soirée »/« hiver » qu'on n'expose pas aux invités).
+  const FEATURED_COUNT = 4;
+  const kioskFilterGroups = useMemo(() => {
+    const build = (key, catalogue) => {
       const known = new Set(catalogue.map(c => c.id));
       const freq = new Map();
       whiskies.forEach(w => (w[key] || []).forEach(v => { if (known.has(v)) freq.set(v, (freq.get(v) || 0) + 1); }));
-      return [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, n)
-        .map(([id]) => ({ type, ...catalogue.find(c => c.id === id) }));
+      return [...freq.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => catalogue.find(c => c.id === id));
     };
-    return [...topFrom('mood', MOODS, 'mood', 4), ...topFrom('profile', TASTE_PROFILES, 'profile', 4)];
+    return { moods: build('mood', MOODS), profiles: build('profile', TASTE_PROFILES) };
   }, [whiskies]);
+
+  const hasHiddenFilters = kioskFilterGroups.moods.length > FEATURED_COUNT || kioskFilterGroups.profiles.length > FEATURED_COUNT;
 
   const filteredWhiskies = useMemo(() => {
     const q = normalizeText(search);
@@ -801,6 +805,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     setGuestName('');
     setSearch('');
     setFilter(null);
+    setShowAllFilters(false);
   };
 
   return (
@@ -899,32 +904,63 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 )}
               </div>
 
-              {kioskFilters.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-2 mb-6 max-w-3xl mx-auto">
-                  <button
-                    type="button"
-                    aria-pressed={!filter}
-                    onClick={() => setFilter(null)}
-                    className={`inline-flex items-center gap-2 px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${!filter ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
-                  >
-                    <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Tout
-                  </button>
-                  {kioskFilters.map(f => {
-                    const isActive = filter?.type === f.type && filter?.id === f.id;
-                    return (
-                      <button
-                        key={`${f.type}-${f.id}`}
-                        type="button"
-                        aria-pressed={isActive}
-                        onClick={() => setFilter(prev => (prev?.type === f.type && prev?.id === f.id) ? null : { type: f.type, id: f.id })}
-                        className={`inline-flex items-center gap-2 px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${isActive ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
-                      >
-                        <f.Icon size={16} strokeWidth={1.5} aria-hidden="true" /> {f.label}
+              {(kioskFilterGroups.moods.length > 0 || kioskFilterGroups.profiles.length > 0) && (() => {
+                const chipClass = (isActive) => `inline-flex items-center gap-2 px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${isActive ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`;
+                const renderGroup = (label, items, type) => {
+                  if (items.length === 0) return null;
+                  let shown = showAllFilters ? items : items.slice(0, FEATURED_COUNT);
+                  // Garder la puce active visible même repliée (sinon filtre appliqué mais invisible).
+                  if (!showAllFilters && filter?.type === type) {
+                    const active = items.find(i => i.id === filter.id);
+                    if (active && !shown.includes(active)) shown = [...shown, active];
+                  }
+                  return (
+                    <div>
+                      <p className="text-stone-300 text-[10px] uppercase tracking-[0.25em] font-bold mb-3">{label}</p>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {shown.map(f => {
+                          const isActive = filter?.type === type && filter?.id === f.id;
+                          return (
+                            <button
+                              key={f.id}
+                              type="button"
+                              aria-pressed={isActive}
+                              onClick={() => setFilter(prev => (prev?.type === type && prev?.id === f.id) ? null : { type, id: f.id })}
+                              className={chipClass(isActive)}
+                            >
+                              <f.Icon size={16} strokeWidth={1.5} aria-hidden="true" /> {f.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                };
+                return (
+                  <div className="mb-6 max-w-3xl mx-auto space-y-5">
+                    <div className="flex justify-center">
+                      <button type="button" aria-pressed={!filter} onClick={() => setFilter(null)} className={chipClass(!filter)}>
+                        <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Tout
                       </button>
-                    );
-                  })}
-                </div>
-              )}
+                    </div>
+                    {renderGroup('Ambiance', kioskFilterGroups.moods, 'mood')}
+                    {renderGroup('Arôme', kioskFilterGroups.profiles, 'profile')}
+                    {hasHiddenFilters && (
+                      <div className="flex justify-center">
+                        <button
+                          type="button"
+                          onClick={() => setShowAllFilters(v => !v)}
+                          aria-expanded={showAllFilters}
+                          className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] text-stone-300 hover:text-amber-300 text-xs uppercase tracking-widest font-bold transition-colors"
+                        >
+                          <ChevronDown size={16} className={`transition-transform ${showAllFilters ? 'rotate-180' : ''}`} aria-hidden="true" />
+                          {showAllFilters ? 'Moins de filtres' : 'Plus de filtres'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3 mb-8 max-w-2xl mx-auto">
                 <div className="w-full sm:flex-1">
