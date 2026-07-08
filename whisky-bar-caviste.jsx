@@ -2016,16 +2016,18 @@ export default function WhiskyBarApp() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-16" inert={(barMode || !!servingWhisky) || undefined}>
         {/* Header */}
         <header className="flex flex-col items-center mb-16 text-center">
-          {/* Titre masqué (accessibilité + structure) : l'emblème porte le nom visuellement,
-              on évite la redite du wordmark tout en gardant le nom pour les lecteurs d'écran. */}
-          <h1 className="sr-only">Le Bar Clandestin</h1>
+          {/* Emblème sans texte (décoratif) + wordmark en titre : pas de redite, nom porté par le H1. */}
           <img
             src="logo.jpg"
-            alt="Le Bar Clandestin"
+            alt=""
+            aria-hidden="true"
             width="512"
             height="512"
-            className="w-44 h-44 md:w-56 md:h-56 rounded-[22%] border border-amber-800/40 shadow-[0_15px_45px_-12px_rgba(0,0,0,0.9),0_0_35px_-5px_rgba(212,175,55,0.2)] mb-8"
+            className="w-32 h-32 md:w-40 md:h-40 rounded-[22%] border border-amber-800/40 shadow-[0_15px_45px_-12px_rgba(0,0,0,0.9),0_0_35px_-5px_rgba(212,175,55,0.2)] mb-6"
           />
+          <h1 className="text-5xl md:text-7xl font-thin text-[var(--whisky-gold)] mb-4 tracking-normal font-serif drop-shadow-sm">
+            Le Bar Clandestin
+          </h1>
           <div className="h-px w-32 bg-amber-800 mb-6" aria-hidden="true"></div>
           <p className="text-stone-300 text-sm tracking-[0.22em] uppercase font-medium">
             Collection Privée • {totalOwned} Référence{totalOwned > 1 ? 's' : ''} • {totalBottles} Bouteille{totalBottles > 1 ? 's' : ''} en Cave
