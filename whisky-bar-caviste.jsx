@@ -993,9 +993,21 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
                 {filteredWhiskies.map(w => {
                   const isCurrent = currentGuest?.whiskyId === w.id;
-                  const chips = (w.profile || []).slice(0, 3)
+                  const activeProfileIds = selectedTags.filter(t => t.type === 'profile').map(t => t.id);
+                  const activeMoodIds = selectedTags.filter(t => t.type === 'mood').map(t => t.id);
+                  // On filtre d'abord aux tags connus, puis on remonte ceux qui matchent le filtre actif,
+                  // pour que la raison du match soit toujours visible sur la carte (bug : slice avant filtre cachait le tag matché).
+                  const matchedMoodChips = (w.mood || [])
+                    .filter(id => activeMoodIds.includes(id))
+                    .map(id => MOODS.find(m => m.id === id))
+                    .filter(Boolean)
+                    .map(m => ({ ...m, matched: true }));
+                  const profileChips = (w.profile || [])
                     .map(pid => TASTE_PROFILES.find(t => t.id === pid))
-                    .filter(Boolean);
+                    .filter(Boolean)
+                    .map(p => ({ ...p, matched: activeProfileIds.includes(p.id) }))
+                    .sort((a, b) => (b.matched ? 1 : 0) - (a.matched ? 1 : 0));
+                  const chips = [...matchedMoodChips, ...profileChips].slice(0, 3);
                   return (
                     <button
                       key={w.id}
@@ -1020,9 +1032,9 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                       <p className="text-sm text-stone-300 mb-3">{w.type} • {w.region}</p>
                       <div className="flex items-center justify-between gap-3 flex-wrap">
                         <span className="flex flex-wrap gap-1.5">
-                          {chips.map(c => (
-                            <span key={c.id} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-stone-800/80 border border-stone-600 text-stone-200 text-xs">
-                              <c.Icon size={13} strokeWidth={1.5} className="text-amber-300/80" aria-hidden="true" /> {c.label}
+                          {chips.map((c, i) => (
+                            <span key={i} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs ${c.matched ? 'bg-amber-500/20 border-amber-500 text-amber-100 font-bold' : 'bg-stone-800/80 border-stone-600 text-stone-200'}`}>
+                              <c.Icon size={13} strokeWidth={1.5} className={c.matched ? 'text-amber-300' : 'text-amber-300/80'} aria-hidden="true" /> {c.label}
                             </span>
                           ))}
                         </span>
