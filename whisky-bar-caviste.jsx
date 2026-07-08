@@ -1957,7 +1957,7 @@ export default function WhiskyBarApp() {
               type="button"
               aria-pressed={view === 'home'}
               onClick={() => setView('home')}
-              className={`flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-all duration-300 ${view === 'home' ? 'bg-[var(--whisky-gold)] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-[color,box-shadow] duration-300 ${view === 'home' ? 'bg-[#d4af37] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
             >
               <Sparkles size={14} aria-hidden="true" /> Sommelier
             </button>
@@ -1965,7 +1965,7 @@ export default function WhiskyBarApp() {
               type="button"
               aria-pressed={view === 'collection'}
               onClick={() => setView('collection')}
-              className={`flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-all duration-300 ${view === 'collection' ? 'bg-[var(--whisky-gold)] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-[color,box-shadow] duration-300 ${view === 'collection' ? 'bg-[#d4af37] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
             >
               <List size={14} aria-hidden="true" /> Inventaire
             </button>
@@ -1973,7 +1973,7 @@ export default function WhiskyBarApp() {
               type="button"
               aria-pressed={view === 'commande'}
               onClick={() => setView('commande')}
-              className={`relative flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-all duration-300 ${view === 'commande' ? 'bg-[var(--whisky-gold)] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
+              className={`relative flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-[color,box-shadow] duration-300 ${view === 'commande' ? 'bg-[#d4af37] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
             >
               <ShoppingCart size={14} aria-hidden="true" /> Commande
               {orderCount > 0 && (
@@ -1986,7 +1986,7 @@ export default function WhiskyBarApp() {
               type="button"
               aria-pressed={view === 'soiree'}
               onClick={() => setView('soiree')}
-              className={`relative flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-all duration-300 ${view === 'soiree' ? 'bg-[var(--whisky-gold)] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
+              className={`relative flex items-center gap-2 px-4 sm:px-8 py-3 min-h-[44px] rounded-full text-xs font-bold uppercase tracking-wider sm:tracking-widest transition-[color,box-shadow] duration-300 ${view === 'soiree' ? 'bg-[#d4af37] text-black shadow-[0_0_20px_rgba(212,175,55,0.25)]' : 'text-stone-200 hover:text-white hover:bg-white/5'}`}
             >
               <Martini size={14} aria-hidden="true" /> Soirée
               {pendingGuestCount > 0 && (
