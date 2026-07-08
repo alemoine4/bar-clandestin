@@ -718,8 +718,14 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   const [step, setStep] = useState('name');
   const [guestName, setGuestName] = useState('');
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState(null);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [showAllFilters, setShowAllFilters] = useState(false);
+  const isTagActive = (type, id) => selectedTags.some(t => t.type === type && t.id === id);
+  const toggleTag = (type, id) => setSelectedTags(prev => (
+    prev.some(t => t.type === type && t.id === id)
+      ? prev.filter(t => !(t.type === type && t.id === id))
+      : [...prev, { type, id }]
+  ));
   const [lastChoice, setLastChoice] = useState(null);
   const screenRef = useRef(null);
   const nameId = useId();
@@ -773,15 +779,24 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
 
   const filteredWhiskies = useMemo(() => {
     const q = normalizeText(search);
-    return whiskies.filter(w => {
-      if (filter) {
-        const field = filter.type === 'mood' ? (w.mood || []) : (w.profile || []);
-        if (!field.includes(filter.id)) return false;
-      }
-      if (!q) return true;
-      return normalizeText(w.name).includes(q) || normalizeText(w.type).includes(q) || normalizeText(w.region).includes(q);
-    });
-  }, [whiskies, search, filter]);
+    const bySearch = whiskies.filter(w => !q
+      || normalizeText(w.name).includes(q) || normalizeText(w.type).includes(q) || normalizeText(w.region).includes(q));
+    if (selectedTags.length === 0) return bySearch;
+    // Même logique que le Sommelier : une bouteille apparaît si elle matche AU MOINS un filtre,
+    // classée par nombre de correspondances (jamais de résultat vide à cause d'un ET trop strict).
+    return bySearch
+      .map(w => {
+        let score = 0;
+        selectedTags.forEach(t => {
+          const field = t.type === 'mood' ? (w.mood || []) : (w.profile || []);
+          if (field.includes(t.id)) score += 1;
+        });
+        return { w, score };
+      })
+      .filter(x => x.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(x => x.w);
+  }, [whiskies, search, selectedTags]);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
@@ -804,7 +819,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     setStep('name');
     setGuestName('');
     setSearch('');
-    setFilter(null);
+    setSelectedTags([]);
     setShowAllFilters(false);
   };
 
@@ -909,24 +924,23 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 const renderGroup = (label, items, type) => {
                   if (items.length === 0) return null;
                   let shown = showAllFilters ? items : items.slice(0, FEATURED_COUNT);
-                  // Garder la puce active visible même repliée (sinon filtre appliqué mais invisible).
-                  if (!showAllFilters && filter?.type === type) {
-                    const active = items.find(i => i.id === filter.id);
-                    if (active && !shown.includes(active)) shown = [...shown, active];
+                  // Garder les puces actives visibles même repliées (sinon filtre appliqué mais invisible).
+                  if (!showAllFilters) {
+                    items.forEach(i => { if (isTagActive(type, i.id) && !shown.includes(i)) shown = [...shown, i]; });
                   }
                   return (
                     <div>
                       <p className="text-stone-300 text-[11px] uppercase tracking-[0.25em] font-bold mb-3">{label}</p>
                       <div className="flex flex-wrap justify-center gap-2">
                         {shown.map(f => {
-                          const isActive = filter?.type === type && filter?.id === f.id;
+                          const active = isTagActive(type, f.id);
                           return (
                             <button
                               key={f.id}
                               type="button"
-                              aria-pressed={isActive}
-                              onClick={() => setFilter(prev => (prev?.type === type && prev?.id === f.id) ? null : { type, id: f.id })}
-                              className={chipClass(isActive)}
+                              aria-pressed={active}
+                              onClick={() => toggleTag(type, f.id)}
+                              className={chipClass(active)}
                             >
                               <f.Icon size={16} strokeWidth={1.5} aria-hidden="true" /> {f.label}
                             </button>
@@ -939,7 +953,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 return (
                   <div className="mb-6 max-w-3xl mx-auto space-y-5">
                     <div className="flex justify-center">
-                      <button type="button" aria-pressed={!filter} onClick={() => setFilter(null)} className={chipClass(!filter)}>
+                      <button type="button" aria-pressed={selectedTags.length === 0} onClick={() => setSelectedTags([])} className={chipClass(selectedTags.length === 0)}>
                         <GlassWater size={16} strokeWidth={1.5} aria-hidden="true" /> Tout
                       </button>
                     </div>
