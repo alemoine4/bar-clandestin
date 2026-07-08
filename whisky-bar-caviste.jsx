@@ -19,7 +19,7 @@ const V2_STOCK_KEY = 'whisky_v2_stock_qty';
 const V2_ORDER_KEY = 'whisky_v2_order';
 const V1_STOCK_KEY = 'whisky_stock_status';
 const V2_PARTY_KEY = 'whisky_v2_party';
-const KIOSK_DONE_TIMEOUT = 10000;
+const KIOSK_DONE_TIMEOUT = 20000;
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 // ═══════════════════════════════════════════════════════════════
@@ -708,6 +708,7 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   const [step, setStep] = useState('name');
   const [guestName, setGuestName] = useState('');
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState(null);
   const [lastChoice, setLastChoice] = useState(null);
   const screenRef = useRef(null);
   const nameId = useId();
@@ -715,7 +716,10 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
   useEffect(() => {
     if (!isBrowser) return undefined;
     const previousFocus = document.activeElement;
-    window.requestAnimationFrame(() => screenRef.current?.focus());
+    window.requestAnimationFrame(() => {
+      const input = screenRef.current?.querySelector('input');
+      (input || screenRef.current)?.focus();
+    });
     return () => previousFocus?.focus?.();
   }, []);
 
@@ -738,13 +742,23 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     ? (whiskies.find(w => w.id === currentGuest.whiskyId)?.name || null)
     : null;
 
+  const kioskProfiles = useMemo(() => {
+    const freq = new Map();
+    whiskies.forEach(w => (w.profile || []).forEach(p => freq.set(p, (freq.get(p) || 0) + 1)));
+    return [...freq.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([id]) => TASTE_PROFILES.find(t => t.id === id) || { id, label: id, emoji: '🥃' });
+  }, [whiskies]);
+
   const filteredWhiskies = useMemo(() => {
     const q = normalizeText(search);
-    if (!q) return whiskies;
-    return whiskies.filter(w =>
-      normalizeText(w.name).includes(q) || normalizeText(w.type).includes(q) || normalizeText(w.region).includes(q)
-    );
-  }, [whiskies, search]);
+    return whiskies.filter(w => {
+      if (filter && !(w.profile || []).includes(filter)) return false;
+      if (!q) return true;
+      return normalizeText(w.name).includes(q) || normalizeText(w.type).includes(q) || normalizeText(w.region).includes(q);
+    });
+  }, [whiskies, search, filter]);
 
   const handleNameSubmit = (e) => {
     e.preventDefault();
@@ -757,10 +771,17 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
     setStep('done');
   };
 
+  const handleSurprise = () => {
+    const pool = filteredWhiskies.length > 0 ? filteredWhiskies : whiskies;
+    if (pool.length === 0) return;
+    handlePick(pool[Math.floor(randomUnit() * pool.length)]);
+  };
+
   const resetToName = () => {
     setStep('name');
     setGuestName('');
     setSearch('');
+    setFilter(null);
   };
 
   return (
@@ -789,6 +810,8 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                   onChange={e => setGuestName(e.target.value)}
                   placeholder="Ton prénom..."
                   autoComplete="off"
+                  autoFocus
+                  enterKeyHint="go"
                   className="w-full px-6 py-4 bg-stone-900/80 border border-stone-600 text-amber-50 text-xl text-center font-serif rounded focus-visible:outline-none focus-visible:border-amber-500 focus-visible:ring-2 focus-visible:ring-amber-500/40 placeholder:text-stone-400 mb-4"
                 />
                 <button
@@ -804,16 +827,20 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 <div className="max-w-lg mx-auto">
                   <p className="text-stone-300 text-[10px] uppercase tracking-[0.25em] font-bold mb-4">Déjà passés au bar</p>
                   <div className="flex flex-wrap justify-center gap-2">
-                    {guests.map(g => (
-                      <button
-                        key={g.id}
-                        type="button"
-                        onClick={() => { setGuestName(g.name); setStep('choose'); }}
-                        className="px-4 py-2 min-h-[44px] rounded-full border border-stone-600 text-stone-200 hover:border-amber-500 hover:text-amber-300 text-sm font-serif transition-colors"
-                      >
-                        {g.name}
-                      </button>
-                    ))}
+                    {guests.map(g => {
+                      const choiceName = whiskies.find(w => w.id === g.whiskyId)?.name;
+                      return (
+                        <button
+                          key={g.id}
+                          type="button"
+                          onClick={() => { setGuestName(g.name); setStep('choose'); }}
+                          className="px-5 py-2.5 min-h-[52px] rounded-2xl border border-stone-600 hover:border-amber-500 transition-colors text-left"
+                        >
+                          <span className="block font-serif text-base text-stone-100">{g.name}</span>
+                          {choiceName && <span className="block text-[11px] text-amber-300/90">{choiceName}</span>}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -833,32 +860,88 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 )}
               </div>
 
-              <div className="max-w-md mx-auto mb-8">
-                <SearchInput value={search} onChange={e => setSearch(e.target.value)} onClear={() => setSearch('')} label="Rechercher un whisky" />
+              {kioskProfiles.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mb-6">
+                  <button
+                    type="button"
+                    aria-pressed={!filter}
+                    onClick={() => setFilter(null)}
+                    className={`px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${!filter ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
+                  >
+                    🥃 Tout
+                  </button>
+                  {kioskProfiles.map(p => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      aria-pressed={filter === p.id}
+                      onClick={() => setFilter(prev => prev === p.id ? null : p.id)}
+                      className={`px-5 py-3 min-h-[52px] rounded-full text-sm font-bold border transition-colors ${filter === p.id ? 'bg-amber-500 border-amber-500 text-black' : 'border-stone-500 text-stone-200 hover:border-amber-500'}`}
+                    >
+                      {p.emoji} {p.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="text-center mb-8">
+                <button
+                  type="button"
+                  onClick={handleSurprise}
+                  className="inline-flex items-center gap-3 px-8 py-4 min-h-[52px] border border-amber-400 text-amber-200 hover:text-black hover:bg-amber-500 rounded-full uppercase text-sm font-bold tracking-widest transition-colors"
+                >
+                  <Sparkles size={18} aria-hidden="true" /> Surprends-moi
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8" role="list">
-                {filteredWhiskies.map(w => (
-                  <button
-                    key={w.id}
-                    type="button"
-                    role="listitem"
-                    onClick={() => handlePick(w)}
-                    className="text-left p-5 rounded border border-stone-600/60 bg-[var(--whisky-surface)] hover:border-amber-500 hover:bg-stone-800/60 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                  >
-                    <div className="flex items-center justify-between gap-3 mb-1">
-                      <span className="font-serif text-xl text-stone-100 group-hover:text-amber-200 transition-colors">{w.name}</span>
-                      <ColorBadge color={w.color} />
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[10px] text-stone-300 uppercase tracking-wider">{w.type} • {w.region}</span>
-                      {w.peatLevel > 0 && <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Tourbe {w.peatLevel}/5</span>}
-                    </div>
-                  </button>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6" role="list">
+                {filteredWhiskies.map(w => {
+                  const isCurrent = currentGuest?.whiskyId === w.id;
+                  const chips = (w.profile || []).slice(0, 3)
+                    .map(pid => TASTE_PROFILES.find(t => t.id === pid))
+                    .filter(Boolean);
+                  return (
+                    <button
+                      key={w.id}
+                      type="button"
+                      role="listitem"
+                      onClick={() => handlePick(w)}
+                      className={`text-left p-5 rounded transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 border ${
+                        isCurrent
+                          ? 'border-amber-500 bg-amber-950/40 shadow-[0_0_20px_-5px_rgba(245,158,11,0.3)]'
+                          : 'border-stone-600/60 bg-[var(--whisky-surface)] hover:border-amber-500 hover:bg-stone-800/60'
+                      }`}
+                    >
+                      {isCurrent && (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-300 mb-2">
+                          <CheckCircle2 size={14} aria-hidden="true" /> Ton choix actuel
+                        </span>
+                      )}
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <span className="font-serif text-2xl text-stone-100 group-hover:text-amber-200 transition-colors">{w.name}</span>
+                        <ColorBadge color={w.color} />
+                      </div>
+                      <p className="text-sm text-stone-300 mb-3">{w.type} • {w.region}</p>
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <span className="flex flex-wrap gap-1.5">
+                          {chips.map(c => (
+                            <span key={c.id} className="px-2.5 py-1 rounded-full bg-stone-800/80 border border-stone-600 text-stone-200 text-xs">
+                              {c.emoji} {c.label}
+                            </span>
+                          ))}
+                        </span>
+                        {w.peatLevel > 0 && <span className="text-xs text-amber-400 font-bold uppercase tracking-wider">Tourbe {w.peatLevel}/5</span>}
+                      </div>
+                    </button>
+                  );
+                })}
                 {filteredWhiskies.length === 0 && (
                   <p className="col-span-full text-center text-stone-300 font-serif italic py-10">Aucune bouteille ne correspond.</p>
                 )}
+              </div>
+
+              <div className="max-w-md mx-auto mb-8">
+                <SearchInput value={search} onChange={e => setSearch(e.target.value)} onClear={() => setSearch('')} label="Rechercher un whisky" />
               </div>
 
               <div className="text-center">
@@ -876,13 +959,22 @@ const GuestKiosk = ({ whiskies, guests, onChoose, onExit }) => {
                 C'est noté, <span className="text-[var(--whisky-gold)]">{lastChoice.name}</span> !
               </h1>
               <p className="text-2xl text-[var(--whisky-muted-gold)] font-serif italic mb-12">Ton {lastChoice.whisky} arrive.</p>
-              <button
-                type="button"
-                onClick={resetToName}
-                className="px-10 py-4 min-h-[48px] bg-amber-500 text-black font-bold rounded hover:bg-amber-400 transition-colors uppercase text-sm tracking-widest"
-              >
-                Invité suivant
-              </button>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={resetToName}
+                  className="px-10 py-4 min-h-[52px] bg-amber-500 text-black font-bold rounded hover:bg-amber-400 transition-colors uppercase text-sm tracking-widest"
+                >
+                  Invité suivant
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setStep('choose')}
+                  className="px-10 py-4 min-h-[52px] border border-stone-500 text-stone-200 hover:border-amber-500 hover:text-amber-300 rounded transition-colors uppercase text-sm tracking-widest"
+                >
+                  Changer mon choix
+                </button>
+              </div>
             </div>
           )}
         </div>
