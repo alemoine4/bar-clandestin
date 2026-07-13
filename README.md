@@ -1,6 +1,8 @@
 # 🥃 Le Bar Clandestin
 
-Cave à whiskies personnelle : sommelier par ambiances et profils aromatiques, inventaire avec stock quantitatif, bon de commande avec pointage à réception. Toutes les données restent dans le navigateur (localStorage) — aucun serveur, aucun compte.
+Cave à whiskies personnelle : sommelier par ambiances et profils aromatiques, inventaire avec stock quantitatif, bon de commande avec pointage à réception, mode Soirée (kiosque invité avec illustrations de bouteilles). **PWA installable et 100 % fonctionnelle hors-ligne.** Toutes les données restent dans le navigateur (localStorage) — aucun serveur, aucun compte.
+
+Les illustrations de bouteilles (non officielles, sans marque lisible) vivent dans `public/bottles/` (WebP), mappées par `BOTTLE_IMAGE_BY_ID` ; fallback propre (pastille de robe) quand une bouteille n'a pas d'image. Design system documenté dans [design-system/MASTER.md](design-system/MASTER.md).
 
 **App en ligne : https://alemoine4.github.io/bar-clandestin/**
 
