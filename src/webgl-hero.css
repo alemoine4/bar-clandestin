@@ -1,0 +1,58 @@
+.v2-webgl-scene {
+  position: absolute;
+  inset: -5% -4% 0 -4%;
+  z-index: 3;
+  min-height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 35px 42px rgba(0,0,0,.44));
+}
+
+.v2-webgl-scene canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.v2-webgl-fallback {
+  position: absolute;
+  inset: 14% 18% 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(218,128,43,.22), rgba(108,44,12,.08) 42%, transparent 72%);
+  filter: blur(24px);
+}
+
+.v2-caption--webgl {
+  z-index: 8;
+  bottom: 3%;
+  opacity: calc(1 - var(--burst) * 1.2);
+}
+
+.v2-caption--webgl strong {
+  font-size: 21px;
+}
+
+.v2-caption--webgl span {
+  letter-spacing: .16em;
+}
+
+@media (max-width: 880px) {
+  .v2-webgl-scene {
+    inset: -3% -8% 0 -8%;
+  }
+}
+
+@media (max-width: 620px) {
+  .v2-webgl-scene {
+    inset: -2% -14% 0 -14%;
+  }
+
+  .v2-caption--webgl {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-webgl-scene {
+    transform: none !important;
+  }
+}
