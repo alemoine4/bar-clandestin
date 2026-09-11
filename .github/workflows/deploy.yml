@@ -70,3 +70,5 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+# Preview V2 reconstruite depuis v2-immersive-prototype
