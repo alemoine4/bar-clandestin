@@ -3,6 +3,7 @@ import { Flame, GlassWater, Boxes, Users, Sparkles } from 'lucide-react';
 import WhiskyScene3D from './WhiskyScene3D.jsx';
 import './immersive.css';
 import './immersive-3d.css';
+import './webgl-hero.css';
 
 const BASE = import.meta.env.BASE_URL;
 
