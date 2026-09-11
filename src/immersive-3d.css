@@ -1,0 +1,383 @@
+.v2-hero {
+  min-height: 165svh;
+  perspective: 1800px;
+  transform-style: preserve-3d;
+}
+
+.v2-sticky-stage {
+  position: sticky;
+  top: 0;
+  min-height: calc(100svh - 56px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 2px;
+}
+
+.v2-hero__backdrop {
+  transform: scale(1.075)
+    translate3d(calc(var(--tilt-x) * -12px), calc(var(--tilt-y) * -8px), -70px);
+  transition: transform 180ms cubic-bezier(.2,.75,.25,1), filter 160ms linear;
+  filter: saturate(calc(.86 + var(--burst) * .18)) brightness(calc(.8 + var(--burst) * .08)) contrast(1.07);
+  will-change: transform, filter;
+}
+
+.v2-hero__light {
+  transform: translate3d(calc(var(--tilt-x) * 24px), calc(var(--tilt-y) * 16px), -10px) scale(calc(1 + var(--burst) * .08));
+  transition: transform 180ms cubic-bezier(.2,.75,.25,1);
+  opacity: calc(.95 + var(--burst) * .05);
+  will-change: transform;
+}
+
+.v2-burst-flare {
+  position: absolute;
+  z-index: 1;
+  left: 70%;
+  top: 47%;
+  width: clamp(210px, 31vw, 480px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(calc(.45 + var(--burst) * 1.08));
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255,236,181,calc(var(--burst) * .48)) 0 8%, rgba(255,183,76,calc(var(--burst) * .36)) 19%, rgba(183,78,15,calc(var(--burst) * .18)) 42%, transparent 73%);
+  filter: blur(calc(8px + var(--burst) * 19px));
+  opacity: clamp(0, calc(var(--burst) * 1.45), 1);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.v2-hero__copy {
+  transform: translate3d(calc(var(--burst) * -18px), 0, 0);
+  opacity: calc(1 - var(--burst) * .55);
+  transition: transform 100ms linear, opacity 100ms linear;
+}
+
+.v2-hero__visual {
+  isolation: isolate;
+  transform: rotateX(calc(var(--tilt-y) * -2deg)) rotateY(calc(var(--tilt-x) * 3deg)) translateZ(0);
+  transform-origin: 50% 55%;
+  transition: transform 170ms cubic-bezier(.2,.75,.25,1);
+  will-change: transform;
+}
+
+.v2-hero__visual::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  width: 82%;
+  height: 21%;
+  transform: translateX(-50%) rotateX(69deg) translateZ(-56px) scale(calc(1 + var(--burst) * .16));
+  transform-origin: center bottom;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(190,96,30,.30), rgba(67,30,12,.30) 38%, rgba(8,5,3,.82) 72%);
+  box-shadow: inset 0 18px 38px rgba(255,171,80,.05), 0 -12px 60px rgba(216,113,36,.10);
+  opacity: calc(1 - var(--burst) * .45);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.v2-hero__visual::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 66%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) translateZ(-82px) scale(calc(1 + var(--burst) * .4));
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,169,67,.25), rgba(141,72,23,.08) 40%, transparent 72%);
+  filter: blur(20px);
+  opacity: calc(1 - var(--burst) * .25);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.v2-orbit {
+  transform-style: preserve-3d;
+  will-change: transform;
+  opacity: calc(1 - var(--burst) * .9);
+}
+
+.v2-orbit--1 {
+  transform: translate(-50%, -50%) rotateX(72deg) rotateZ(calc(var(--tilt-x) * 4deg + var(--burst) * 18deg)) translateZ(-35px) scale(calc(1 + var(--burst) * .25));
+  animation: v2-orbit-drift 10s linear infinite;
+}
+
+.v2-orbit--2 {
+  transform: translate(-50%, -50%) rotateX(65deg) rotateZ(calc(var(--tilt-x) * -5deg - var(--burst) * 24deg)) translateZ(16px) scale(calc(1 + var(--burst) * .18));
+  animation: v2-orbit-drift-reverse 13s linear infinite;
+}
+
+.v2-bottle-wrap {
+  transform-style: preserve-3d;
+  transform:
+    translateX(-50%)
+    translate3d(calc(var(--tilt-x) * 20px), calc(var(--tilt-y) * 12px - var(--burst) * 24px), calc(92px + var(--burst) * 62px))
+    rotateX(calc(var(--tilt-y) * -4deg - var(--burst) * 4deg))
+    rotateY(calc(var(--tilt-x) * 9deg + var(--burst) * 14deg))
+    rotateZ(calc(var(--tilt-x) * .7deg + var(--burst) * 1.2deg));
+  transition: transform 90ms linear;
+  will-change: transform;
+  z-index: 4;
+}
+
+.v2-bottle-wrap::before {
+  content: '';
+  position: absolute;
+  z-index: 7;
+  inset: 5% 21% 7% 21%;
+  border-radius: 42% 42% 20% 20%;
+  background: linear-gradient(106deg, transparent 17%, rgba(255,245,220,0) 35%, rgba(255,244,211,.20) 45%, rgba(255,255,255,.31) 49%, rgba(255,236,194,.10) 56%, transparent 69%);
+  transform: translateX(calc(var(--tilt-x) * 22px + var(--burst) * 16px));
+  mix-blend-mode: screen;
+  filter: blur(.8px);
+  opacity: calc(.78 * (1 - var(--burst) * .72));
+  pointer-events: none;
+}
+
+.v2-bottle-wrap::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 10%;
+  width: 82%;
+  height: 78%;
+  transform: translateX(-50%) translateZ(-45px) scale(calc(1 + var(--burst) * .5));
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(238,139,44,.18), transparent 69%);
+  filter: blur(24px);
+  opacity: calc(1 - var(--burst) * .28);
+  pointer-events: none;
+}
+
+.v2-bottle {
+  transform: translateZ(24px) scale(calc(1 + var(--burst) * .025));
+  filter:
+    drop-shadow(calc(var(--tilt-x) * -8px) 36px 30px rgba(0,0,0,.64))
+    saturate(calc(1.04 + var(--burst) * .16))
+    contrast(calc(1.04 + var(--burst) * .08))
+    brightness(calc(1 + var(--burst) * .12));
+  opacity: clamp(0, calc(1 - var(--burst) * 1.65), 1);
+  transition: opacity 70ms linear, filter 70ms linear;
+}
+
+.v2-cracks {
+  position: absolute;
+  z-index: 12;
+  inset: 12% 27% 10% 27%;
+  pointer-events: none;
+  opacity: clamp(0, calc((var(--burst) - .04) * 5.5), .95);
+  filter: drop-shadow(0 0 3px rgba(255,199,111,.6));
+}
+
+.v2-cracks i {
+  position: absolute;
+  left: 49%;
+  top: 42%;
+  width: 1.5px;
+  height: 34%;
+  transform-origin: 50% 0;
+  background: linear-gradient(180deg, rgba(255,245,223,.96), rgba(215,151,70,.72), transparent);
+  box-shadow: 0 0 6px rgba(255,193,94,.48);
+}
+.v2-cracks i:nth-child(1) { transform: rotate(11deg) translateY(-18%); }
+.v2-cracks i:nth-child(2) { transform: rotate(53deg) translateY(-10%) scaleY(.86); }
+.v2-cracks i:nth-child(3) { transform: rotate(102deg) translateY(-7%) scaleY(.72); }
+.v2-cracks i:nth-child(4) { transform: rotate(156deg) translateY(-15%) scaleY(.9); }
+.v2-cracks i:nth-child(5) { transform: rotate(218deg) translateY(-8%) scaleY(.78); }
+.v2-cracks i:nth-child(6) { transform: rotate(292deg) translateY(-12%) scaleY(.96); }
+
+.v2-shards {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.v2-shard {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  clip-path: var(--clip);
+  opacity: clamp(0, calc((var(--burst) - .12) * 3.7), calc(1 - var(--burst) * .18));
+  transform-origin: 50% 50%;
+  transform:
+    translate3d(calc(var(--dx) * var(--burst)), calc(var(--dy) * var(--burst)), calc(var(--dz) * var(--burst)))
+    rotateX(calc(var(--burst) * 42deg))
+    rotateY(calc(var(--burst) * -58deg))
+    rotateZ(calc(var(--rz) * var(--burst)))
+    scale(calc(1 - var(--burst) * .13));
+  filter:
+    drop-shadow(0 20px 18px rgba(0,0,0,.43))
+    brightness(calc(1 + var(--burst) * .22));
+  will-change: transform, opacity;
+}
+
+.v2-shard:nth-child(2n) {
+  transform:
+    translate3d(calc(var(--dx) * var(--burst)), calc(var(--dy) * var(--burst)), calc(var(--dz) * var(--burst)))
+    rotateX(calc(var(--burst) * -38deg))
+    rotateY(calc(var(--burst) * 51deg))
+    rotateZ(calc(var(--rz) * var(--burst)))
+    scale(calc(1 - var(--burst) * .10));
+}
+
+.v2-shard:nth-child(3n) {
+  filter: drop-shadow(0 22px 18px rgba(0,0,0,.38)) brightness(calc(1.05 + var(--burst) * .32));
+}
+
+.v2-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 13;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.v2-particles i {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,202,113,.94);
+  box-shadow: 0 0 12px rgba(255,164,54,.95), 0 0 24px rgba(255,122,29,.52);
+  opacity: clamp(0, calc((var(--burst) - .16) * 3.4), calc(1 - var(--burst) * .35));
+  transform:
+    translate3d(calc(var(--px) * var(--burst)), calc(var(--py) * var(--burst)), calc(var(--pz) * var(--burst)))
+    scale(calc(.45 + var(--burst) * .9));
+  will-change: transform, opacity;
+}
+
+.v2-bottle-shadow {
+  transform: translateX(calc(-50% + var(--tilt-x) * -8px)) scaleX(calc(1 - var(--tilt-y) * .03 + var(--burst) * .35));
+  opacity: calc(.54 * (1 - var(--burst)));
+}
+
+.v2-glass {
+  z-index: 7;
+  transform-style: preserve-3d;
+  transform:
+    translate3d(calc(var(--tilt-x) * 16px + var(--burst) * 44px), calc(var(--tilt-y) * 10px + var(--burst) * 22px), calc(128px + var(--burst) * 78px))
+    rotateY(calc(var(--tilt-x) * 6deg + var(--burst) * -8deg))
+    rotateZ(calc(-2deg + var(--burst) * 7deg));
+  transition: transform 90ms linear;
+  backdrop-filter: blur(2px);
+  overflow: hidden;
+  opacity: calc(1 - var(--burst) * .28);
+}
+
+.v2-glass::before {
+  content: '';
+  position: absolute;
+  inset: -20% 46% -20% 14%;
+  transform: rotate(11deg) translateX(calc(var(--tilt-x) * 10px + var(--burst) * 9px));
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.23), transparent);
+  opacity: .65;
+  pointer-events: none;
+}
+
+.v2-caption {
+  transform: translateX(-50%) translate3d(calc(var(--tilt-x) * 5px), calc(var(--tilt-y) * 3px + var(--burst) * 18px), 44px);
+  opacity: clamp(0, calc(1 - var(--burst) * 1.55), 1);
+  transition: transform 90ms linear, opacity 90ms linear;
+}
+
+.v2-entrybar {
+  perspective: 1000px;
+  opacity: calc(.84 + var(--burst) * .16);
+  transform: translateY(calc((1 - var(--burst)) * 5px));
+  transition: opacity 90ms linear, transform 90ms linear;
+}
+
+.v2-entrybar button {
+  transform: translateZ(0);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .v2-entrybar button:hover {
+    transform: translateY(-5px) translateZ(22px) rotateX(1.5deg);
+    box-shadow: 0 16px 30px rgba(0,0,0,.27), 0 0 20px rgba(212,175,55,.06);
+  }
+
+  .v2-nav-cta:hover,
+  .v2-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(0,0,0,.28), 0 0 28px rgba(212,175,55,.12);
+  }
+}
+
+@keyframes v2-orbit-drift {
+  from { margin-left: 0; }
+  50% { margin-left: 7px; }
+  to { margin-left: 0; }
+}
+
+@keyframes v2-orbit-drift-reverse {
+  from { margin-left: 0; }
+  50% { margin-left: -7px; }
+  to { margin-left: 0; }
+}
+
+@media (max-width: 880px) {
+  .v2-hero { min-height: 145svh; }
+  .v2-sticky-stage { min-height: calc(100svh - 38px); }
+  .v2-hero__backdrop,
+  .v2-hero__light,
+  .v2-hero__visual { transform: none; }
+
+  .v2-bottle-wrap {
+    transform: translateX(-50%) translate3d(0, calc(var(--burst) * -12px), calc(42px + var(--burst) * 32px)) rotateY(calc(var(--burst) * 7deg));
+  }
+
+  .v2-shard {
+    transform:
+      translate3d(calc(var(--dx) * var(--burst) * .62), calc(var(--dy) * var(--burst) * .62), calc(var(--dz) * var(--burst) * .55))
+      rotateZ(calc(var(--rz) * var(--burst) * .72));
+  }
+
+  .v2-particles i {
+    transform: translate3d(calc(var(--px) * var(--burst) * .56), calc(var(--py) * var(--burst) * .56), 0) scale(calc(.45 + var(--burst) * .72));
+  }
+
+  .v2-glass {
+    transform: translate3d(calc(var(--burst) * 16px), calc(var(--burst) * 10px), 54px) rotateZ(calc(-2deg + var(--burst) * 4deg));
+  }
+}
+
+@media (max-width: 620px) {
+  .v2-hero { min-height: 138svh; }
+  .v2-cracks { inset: 12% 24% 9% 24%; }
+  .v2-burst-flare { left: 56%; top: 64%; width: min(74vw, 360px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-hero { min-height: 100svh; }
+  .v2-sticky-stage { position: relative; min-height: auto; }
+  .v2-shards,
+  .v2-particles,
+  .v2-cracks,
+  .v2-burst-flare { display: none; }
+  .v2-bottle { opacity: 1 !important; }
+  .v2-hero__copy { opacity: 1 !important; transform: none !important; }
+  .v2-hero__backdrop,
+  .v2-hero__light,
+  .v2-hero__visual,
+  .v2-bottle-wrap,
+  .v2-orbit--1,
+  .v2-orbit--2,
+  .v2-glass,
+  .v2-caption,
+  .v2-entrybar button {
+    animation: none !important;
+    transition: none !important;
+  }
+}
