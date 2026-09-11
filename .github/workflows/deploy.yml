@@ -71,4 +71,4 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 
-# Preview V2 reconstruite depuis v2-immersive-prototype
+# Preview V2 reconstruite depuis v2-immersive-prototype — WebGL refresh 2026-09-11
