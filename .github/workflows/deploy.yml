@@ -2,7 +2,7 @@ name: Déploiement GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, v2-immersive-prototype]
   workflow_dispatch:
 
 permissions:
@@ -18,19 +18,48 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Récupérer le site public
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: site-main
+
+      - name: Récupérer la preview V2
+        uses: actions/checkout@v4
+        with:
+          ref: v2-immersive-prototype
+          path: site-preview
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+
+      - name: Construire le site public
+        run: |
+          cd site-main
+          npm ci
+          npm run build
+
+      - name: Construire la preview V2
+        run: |
+          cd site-preview
+          npm ci
+          npm run build
+
+      - name: Assembler racine + preview
+        run: |
+          mkdir -p public-site
+          cp -R site-main/dist/. public-site/
+          mkdir -p public-site/preview
+          cp -R site-preview/dist/. public-site/preview/
+
       - uses: actions/configure-pages@v5
         with:
           enablement: true
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: public-site
 
   deploy:
     needs: build
