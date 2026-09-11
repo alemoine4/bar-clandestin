@@ -16,6 +16,21 @@
   will-change: transform;
 }
 
+.v2-burst-flare {
+  position: absolute;
+  z-index: 1;
+  left: 70%;
+  top: 47%;
+  width: clamp(180px, 28vw, 420px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) scale(calc(.72 + var(--burst) * .7));
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,191,92,calc(var(--burst) * .34)), rgba(190,92,20,calc(var(--burst) * .16)) 36%, transparent 72%);
+  filter: blur(calc(12px + var(--burst) * 16px));
+  opacity: var(--burst);
+  pointer-events: none;
+}
+
 .v2-hero__visual {
   isolation: isolate;
   transform: rotateX(calc(var(--tilt-y) * -1.7deg)) rotateY(calc(var(--tilt-x) * 2.5deg));
@@ -34,12 +49,8 @@
   transform: translateX(-50%) rotateX(68deg) translateZ(-38px);
   transform-origin: center bottom;
   border-radius: 50%;
-  background:
-    radial-gradient(ellipse at center, rgba(180,91,27,.25) 0%, rgba(67,30,12,.28) 36%, rgba(8,5,3,.78) 70%);
-  box-shadow:
-    inset 0 18px 35px rgba(239,155,69,.04),
-    0 -10px 55px rgba(199,105,33,.08);
-  filter: blur(.2px);
+  background: radial-gradient(ellipse at center, rgba(180,91,27,.25), rgba(67,30,12,.28) 36%, rgba(8,5,3,.78) 70%);
+  box-shadow: inset 0 18px 35px rgba(239,155,69,.04), 0 -10px 55px rgba(199,105,33,.08);
   pointer-events: none;
   z-index: 0;
 }
@@ -62,11 +73,11 @@
 .v2-orbit {
   transform-style: preserve-3d;
   will-change: transform;
+  opacity: calc(1 - var(--burst) * .65);
 }
 
 .v2-orbit--1 {
   transform: translate(-50%, -50%) rotateX(70deg) rotateZ(calc(var(--tilt-x) * 3deg)) translateZ(-28px);
-  box-shadow: 0 0 50px rgba(212,175,55,.025);
   animation: v2-orbit-drift 12s linear infinite;
 }
 
@@ -79,12 +90,11 @@
   transform-style: preserve-3d;
   transform:
     translateX(-50%)
-    translate3d(calc(var(--tilt-x) * 18px), calc(var(--tilt-y) * 11px), 82px)
-    rotateX(calc(var(--tilt-y) * -3.5deg))
-    rotateY(calc(var(--tilt-x) * 8deg))
+    translate3d(calc(var(--tilt-x) * 18px), calc(var(--tilt-y) * 11px - var(--burst) * 18px), calc(82px + var(--burst) * 40px))
+    rotateX(calc(var(--tilt-y) * -3.5deg + var(--burst) * -3deg))
+    rotateY(calc(var(--tilt-x) * 8deg + var(--burst) * 10deg))
     rotateZ(calc(var(--tilt-x) * .55deg));
-  transition: transform 220ms cubic-bezier(.2,.75,.25,1);
-  animation: v2-bottle-float 5.8s ease-in-out infinite;
+  transition: transform 120ms linear;
   will-change: transform;
   z-index: 4;
 }
@@ -95,21 +105,12 @@
   z-index: 5;
   inset: 6% 23% 8% 23%;
   border-radius: 42% 42% 20% 20%;
-  background: linear-gradient(
-    106deg,
-    transparent 20%,
-    rgba(255,245,220,0) 38%,
-    rgba(255,244,211,.16) 46%,
-    rgba(255,255,255,.24) 49%,
-    rgba(255,236,194,.08) 54%,
-    transparent 67%
-  );
+  background: linear-gradient(106deg, transparent 20%, rgba(255,245,220,0) 38%, rgba(255,244,211,.16) 46%, rgba(255,255,255,.24) 49%, rgba(255,236,194,.08) 54%, transparent 67%);
   transform: translateX(calc(var(--tilt-x) * 18px));
   mix-blend-mode: screen;
   filter: blur(1px);
-  opacity: .72;
+  opacity: calc(.72 * (1 - var(--burst)));
   pointer-events: none;
-  transition: transform 180ms ease-out, opacity 180ms ease-out;
 }
 
 .v2-bottle-wrap::after {
@@ -120,36 +121,72 @@
   top: 12%;
   width: 72%;
   height: 74%;
-  transform: translateX(-50%) translateZ(-35px);
+  transform: translateX(-50%) translateZ(-35px) scale(calc(1 + var(--burst) * .34));
   border-radius: 50%;
   background: radial-gradient(ellipse, rgba(220,126,37,.13), transparent 68%);
   filter: blur(20px);
+  opacity: calc(1 - var(--burst) * .4);
   pointer-events: none;
 }
 
 .v2-bottle {
-  transform: translateZ(20px);
-  filter:
-    drop-shadow(calc(var(--tilt-x) * -7px) 34px 28px rgba(0,0,0,.60))
-    saturate(1.04)
-    contrast(1.04);
-  transition: filter 180ms ease-out;
+  transform: translateZ(20px) scale(calc(1 - var(--burst) * .055));
+  filter: drop-shadow(calc(var(--tilt-x) * -7px) 34px 28px rgba(0,0,0,.60)) saturate(1.04) contrast(1.04);
+  opacity: calc(1 - min(1, var(--burst) * 1.7));
+  transition: opacity 80ms linear;
+}
+
+.v2-shards {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+.v2-shard {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  clip-path: var(--clip);
+  opacity: clamp(0, calc(var(--burst) * 2.2), 1);
+  transform-origin: 50% 50%;
+  transform:
+    translate3d(
+      calc(var(--dx) * var(--burst)),
+      calc(var(--dy) * var(--burst)),
+      calc(var(--dz) * var(--burst))
+    )
+    rotateX(calc(var(--burst) * 26deg))
+    rotateY(calc(var(--burst) * -34deg))
+    rotateZ(calc(var(--rz) * var(--burst)))
+    scale(calc(1 - var(--burst) * .08));
+  filter: drop-shadow(0 18px 16px rgba(0,0,0,.34));
+  will-change: transform, opacity;
+}
+
+.v2-shard:nth-child(2n) {
+  transform:
+    translate3d(calc(var(--dx) * var(--burst)), calc(var(--dy) * var(--burst)), calc(var(--dz) * var(--burst)))
+    rotateX(calc(var(--burst) * -22deg))
+    rotateY(calc(var(--burst) * 31deg))
+    rotateZ(calc(var(--rz) * var(--burst)))
+    scale(calc(1 - var(--burst) * .1));
 }
 
 .v2-bottle-shadow {
-  transform: translateX(calc(-50% + var(--tilt-x) * -8px)) scaleX(calc(1 - var(--tilt-y) * .03));
-  opacity: calc(.52 + var(--tilt-y) * .05);
-  transition: transform 180ms ease-out, opacity 180ms ease-out;
+  transform: translateX(calc(-50% + var(--tilt-x) * -8px)) scaleX(calc(1 - var(--tilt-y) * .03 + var(--burst) * .22));
+  opacity: calc(.52 * (1 - var(--burst)));
 }
 
 .v2-glass {
   z-index: 7;
   transform-style: preserve-3d;
-  transform:
-    translate3d(calc(var(--tilt-x) * 15px), calc(var(--tilt-y) * 9px), 118px)
-    rotateY(calc(var(--tilt-x) * 5deg))
-    rotateZ(-2deg);
-  transition: transform 220ms cubic-bezier(.2,.75,.25,1);
+  transform: translate3d(calc(var(--tilt-x) * 15px + var(--burst) * 26px), calc(var(--tilt-y) * 9px + var(--burst) * 16px), calc(118px + var(--burst) * 45px)) rotateY(calc(var(--tilt-x) * 5deg)) rotateZ(calc(-2deg + var(--burst) * 5deg));
+  transition: transform 120ms linear;
   backdrop-filter: blur(2px);
   overflow: hidden;
 }
@@ -164,19 +201,16 @@
   pointer-events: none;
 }
 
-.v2-glass span {
-  box-shadow:
-    inset 0 8px 12px rgba(255,198,100,.14),
-    0 0 23px rgba(225,127,31,.12);
-}
-
 .v2-caption {
-  transform: translateX(-50%) translate3d(calc(var(--tilt-x) * 4px), calc(var(--tilt-y) * 3px), 38px);
-  transition: transform 220ms cubic-bezier(.2,.75,.25,1);
+  transform: translateX(-50%) translate3d(calc(var(--tilt-x) * 4px), calc(var(--tilt-y) * 3px + var(--burst) * 12px), 38px);
+  opacity: calc(1 - var(--burst) * 1.35);
+  transition: transform 120ms linear, opacity 120ms linear;
 }
 
 .v2-entrybar {
   perspective: 900px;
+  transform: translateY(calc((1 - var(--burst)) * 8px));
+  opacity: calc(.78 + var(--burst) * .22);
 }
 
 .v2-entrybar button {
@@ -197,11 +231,6 @@
   }
 }
 
-@keyframes v2-bottle-float {
-  0%, 100% { margin-top: 0; }
-  50% { margin-top: -7px; }
-}
-
 @keyframes v2-orbit-drift {
   from { margin-left: 0; }
   50% { margin-left: 5px; }
@@ -217,20 +246,25 @@
 @media (max-width: 880px) {
   .v2-hero__backdrop,
   .v2-hero__light,
-  .v2-hero__visual {
-    transform: none;
-  }
+  .v2-hero__visual { transform: none; }
 
   .v2-bottle-wrap {
-    transform: translateX(-50%) translate3d(0, 0, 36px) rotateY(-2deg);
+    transform: translateX(-50%) translate3d(0, calc(var(--burst) * -8px), calc(36px + var(--burst) * 20px)) rotateY(calc(var(--burst) * 5deg));
+  }
+
+  .v2-shard {
+    transform: translate3d(calc(var(--dx) * var(--burst) * .58), calc(var(--dy) * var(--burst) * .58), calc(var(--dz) * var(--burst) * .5)) rotateZ(calc(var(--rz) * var(--burst) * .65));
   }
 
   .v2-glass {
-    transform: translate3d(0, 0, 50px) rotateZ(-2deg);
+    transform: translate3d(calc(var(--burst) * 12px), calc(var(--burst) * 8px), 50px) rotateZ(calc(-2deg + var(--burst) * 3deg));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .v2-shards { display: none; }
+  .v2-burst-flare { display: none; }
+  .v2-bottle { opacity: 1 !important; }
   .v2-hero__backdrop,
   .v2-hero__light,
   .v2-hero__visual,
