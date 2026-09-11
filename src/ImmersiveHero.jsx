@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Flame, GlassWater, Boxes, Users, Sparkles } from 'lucide-react';
 import './immersive.css';
+import './immersive-3d.css';
 
 const BASE = import.meta.env.BASE_URL;
 
