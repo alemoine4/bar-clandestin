@@ -46,12 +46,14 @@ jobs:
           npm ci
           npm run build
 
-      - name: Assembler racine + preview
+      - name: Assembler racine + previews
         run: |
           mkdir -p public-site
           cp -R site-main/dist/. public-site/
           mkdir -p public-site/preview
           cp -R site-preview/dist/. public-site/preview/
+          mkdir -p public-site/webgl
+          cp -R site-preview/dist/. public-site/webgl/
 
       - uses: actions/configure-pages@v5
         with:
@@ -71,4 +73,4 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 
-# Preview V2 reconstruite depuis v2-immersive-prototype — WebGL refresh 2026-09-11
+# V2 publiée dans /preview/ et /webgl/ ; /webgl/ sert de route propre sans ancien cache PWA.
