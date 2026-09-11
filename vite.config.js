@@ -31,9 +31,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,webp,jpg,png,svg}'],
-        // Important : le service worker de l'app principale ne doit jamais
-        // intercepter la V2 servie dans /preview/, sinon il renvoie l'ancien index.
-        navigateFallbackDenylist: [/\/preview(?:\/|$)/]
+        // Le service worker principal ne doit jamais intercepter les previews V2.
+        navigateFallbackDenylist: [/\/(?:preview|webgl)(?:\/|$)/]
       }
     })
   ]
