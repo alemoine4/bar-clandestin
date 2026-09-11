@@ -41,9 +41,13 @@ export default function ImmersiveHero() {
     document.getElementById('bar-app')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const backgroundStyle = {
+    background: `linear-gradient(90deg, rgba(5,3,2,.95) 0%, rgba(8,5,3,.74) 42%, rgba(7,4,2,.45) 70%, rgba(5,3,2,.80) 100%), linear-gradient(180deg, rgba(10,6,3,.12), rgba(5,3,2,.82)), url('${BASE}fond.jpg') center / cover no-repeat`,
+  };
+
   return (
     <section ref={heroRef} className="v2-hero" aria-labelledby="v2-hero-title">
-      <div className="v2-hero__background" aria-hidden="true" />
+      <div className="v2-hero__background" style={backgroundStyle} aria-hidden="true" />
       <div className="v2-hero__grain" aria-hidden="true" />
       <div className="v2-hero__glow v2-hero__glow--one" aria-hidden="true" />
       <div className="v2-hero__glow v2-hero__glow--two" aria-hidden="true" />
